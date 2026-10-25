@@ -240,7 +240,7 @@ SCRIPT = '''
     c.addEventListener('click',function(e){
       e.preventDefault();
       var t=document.querySelector(c.getAttribute('href'));
-      if(t) window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-12,behavior:'smooth'});
+      if(t) window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-48,behavior:'smooth'});
     });
   });
 })();

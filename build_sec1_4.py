@@ -54,7 +54,7 @@ COVER = '''
 # ── Sticky Header ──
 STICKY_HEADER = '''
 <div id="sticky-header">
-  <div style="max-width:680px;margin:0 auto;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+  <div id="brand-bar" style="max-width:680px;margin:0 auto;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
     <div style="display:flex;align-items:center;gap:8px;">
       <div style="background:rgba(255,255,255,.12);border-radius:6px;padding:4px;display:flex;">
         <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M3.334 14.166L8.334 9.166L3.334 4.166" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/><path d="M10 15.834H16.6667" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/></svg>

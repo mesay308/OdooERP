@@ -8,6 +8,10 @@ from sec8_11 import SEC8, SEC9, SEC10, SEC11, BOTTOM_DOCK, SCRIPT
 # Accordion: state is controlled by the .open class (not inline styles)
 SEC6 = SEC6.replace(' style="display:none;"', '')
 HEAD = HEAD.replace('grid-template-columns:1fr 1fr 1.4fr auto', 'grid-template-columns:1.7fr 1fr auto')
+HEAD = HEAD.replace(
+    '#sticky-header.hidden-up{transform:translateY(-110%);opacity:0;pointer-events:none;}',
+    '#brand-bar{max-height:50px;overflow:hidden;transition:max-height .25s ease,padding .25s ease,opacity .2s ease;}\n#sticky-header.hidden-up #brand-bar{max-height:0;padding-top:0!important;padding-bottom:0!important;opacity:0;pointer-events:none;}'
+)
 SEC6 = SEC6.replace('<div class="acc-item" id="acc-6-1">', '<div class="acc-item open" id="acc-6-1">')
 
 html = (HEAD + '\n<body>\n' + BOTTOM_DOCK + STICKY_HEADER + COVER +
