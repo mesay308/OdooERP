@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Odoo ERP System Overview &amp; Implementation Guide | Addis Tech PLC</title>
+<meta name="description" content="Odoo Enterprise Resource Planning (ERP) System Overview and Implementation Guide by Addis Tech PLC. Learn about ERP benefits, core applications, modules, industries, and our implementation methodology.">
+<meta name="theme-color" content="#1B1464">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand:    '#1B1464',
+        'brand-dark': '#0B0642',
+        'brand-deep': '#000C1D',
+        accent:   '#003B95',
+        amber:    '#FFA600',
+        green:    '#06A225',
+        ice:      '#E5F0FC',
+        paper:    '#FAFAFA',
+        'paper-2':'#F0F0FA',
+        rule:     '#E0E0EE',
+        body:     '#1A1A2E',
+        muted:    '#4A4A6A',
+        'table-h':'#1B1464',
+      },
+      fontFamily: {
+        heading: ['Outfit','sans-serif'],
+        body:    ['Plus Jakarta Sans','sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+/* ── Global Reset & Base ─────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:#FAFAFA;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:#1A1A2E;background:#FAFAFA;overflow-x:hidden;}
+
+/* ── Reading Progress Bar ────────────────────────────────────── */
+#progress-bar{position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,#FFA600,#06A225);z-index:9999;
+  transition:width .1s linear;pointer-events:none;}
+
+/* ── Sticky Header ───────────────────────────────────────────── */
+#sticky-header{position:fixed;top:3px;left:0;right:0;z-index:1000;
+  background:#1B1464;border-bottom:1px solid rgba(255,255,255,.12);
+  transition:transform .3s ease,opacity .25s ease;transform:translateY(0);}
+#sticky-header.hidden-up{transform:translateY(-110%);opacity:0;pointer-events:none;}
+
+/* ── Section Chip Nav ────────────────────────────────────────── */
+#toc-nav{background:#15104E;border-bottom:1px solid rgba(255,255,255,.1);
+  overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+#toc-nav::-webkit-scrollbar{display:none;}
+.toc-chip{display:inline-flex;align-items:center;padding:5px 12px;margin:6px 4px;
+  border-radius:9999px;font-size:.7rem;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
+  color:rgba(240,240,255,.85);background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);text-decoration:none;
+  transition:all .2s;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.toc-chip.active,.toc-chip:hover{background:#FFA600;color:#000C1D;border-color:#FFA600;}
+
+/* ── Document Section Header ─────────────────────────────────── */
+.sec-pill{display:inline-flex;align-items:center;justify-content:center;
+  min-width:24px;height:24px;padding:0 7px;border-radius:9999px;
+  background:#1B1464;color:#fff;font-size:.65rem;font-weight:800;
+  font-family:'Outfit',sans-serif;letter-spacing:.03em;flex-shrink:0;}
+.sec-title{font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:700;color:#1B1464;line-height:1.3;}
+.sec-rule{border:none;border-top:1.5px solid #E0E0EE;margin:8px 0 18px 0;}
+
+/* ── Callout / Quote Box ─────────────────────────────────────── */
+.callout{background:#E5F0FC;border-left:3px solid #003B95;
+  padding:12px 14px;border-radius:0 8px 8px 0;margin:14px 0;
+  font-size:.84rem;line-height:1.55;color:#1A1A2E;font-style:italic;}
+
+/* ── Feature List Item ───────────────────────────────────────── */
+.feat-item{display:flex;gap:8px;align-items:flex-start;padding:8px 0;
+  border-bottom:1px solid #F0F0FA;}
+.feat-item:last-child{border-bottom:none;}
+.feat-dot{color:#FFA600;font-size:.9rem;flex-shrink:0;margin-top:.12rem;line-height:1.5;}
+.feat-title{font-weight:700;color:#1B1464;font-size:.84rem;font-family:'Plus Jakarta Sans',sans-serif;}
+.feat-desc{font-size:.82rem;color:#3A3A5A;line-height:1.5;}
+
+/* ── Responsive Table ────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;border-radius:8px;
+  border:1px solid #D0D0E0;}
+table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:400px;}
+thead tr{background:#1B1464;color:#fff;}
+th{padding:9px 12px;text-align:left;font-weight:700;font-size:.75rem;
+  font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.03em;text-transform:uppercase;}
+td{padding:8px 12px;border-bottom:1px solid #E0E0EE;vertical-align:top;
+  font-size:.8rem;color:#1A1A2E;line-height:1.45;}
+tr:nth-child(even) td{background:#F5F5FF;}
+tr:last-child td{border-bottom:none;}
+
+/* ── Accordion (Section 6) ───────────────────────────────────── */
+.acc-item{border-left:3px solid #D0D0E0;background:#F5F5FF;
+  margin-bottom:8px;border-radius:0 8px 8px 0;overflow:hidden;
+  transition:border-color .2s;}
+.acc-item.open{border-left-color:#1B1464;background:#fff;}
+.acc-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:12px 14px;background:none;border:none;cursor:pointer;text-align:left;}
+.acc-num{display:inline-flex;align-items:center;justify-content:center;
+  min-width:26px;height:26px;border-radius:6px;background:#1B1464;
+  color:#FFA600;font-size:.7rem;font-weight:800;font-family:'Outfit',sans-serif;flex-shrink:0;}
+.acc-name{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;
+  color:#1B1464;line-height:1.3;flex:1;}
+.acc-chevron{flex-shrink:0;width:18px;height:18px;color:#888;transition:transform .25s;}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:#1B1464;}
+.acc-body{display:none;padding:0 14px 14px 14px;}
+.acc-item.open .acc-body{display:block;}
+.acc-subtitle{font-style:italic;font-size:.82rem;color:#003B95;font-weight:600;
+  margin-bottom:8px;line-height:1.4;}
+.acc-intro{font-size:.82rem;color:#3A3A5A;line-height:1.55;margin-bottom:10px;}
+.acc-features-label{font-size:.72rem;font-weight:700;color:#888;
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;margin-top:8px;}
+
+/* ── Industry Tabs (Section 8) ───────────────────────────────── */
+.ind-tabs{display:flex;gap:6px;overflow-x:auto;white-space:nowrap;
+  padding:4px 0 8px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.ind-tabs::-webkit-scrollbar{display:none;}
+.ind-tab{padding:5px 12px;border-radius:9999px;font-size:.72rem;font-weight:600;
+  font-family:'Plus Jakarta Sans',sans-serif;background:#F0F0FA;
+  border:1px solid #D0D0E0;color:#4A4A6A;cursor:pointer;
+  transition:all .2s;flex-shrink:0;white-space:nowrap;}
+.ind-tab.active{background:#1B1464;color:#fff;border-color:#1B1464;}
+.ind-panel{display:none;}
+.ind-panel.active{display:block;}
+.ind-panel-title{font-family:'Outfit',sans-serif;font-size:.95rem;
+  font-weight:700;color:#1B1464;margin-bottom:4px;}
+.ind-panel-intro{font-size:.8rem;color:#4A4A6A;line-height:1.5;margin-bottom:10px;}
+
+/* ── Phase Steps ─────────────────────────────────────────────── */
+.phase-step{display:flex;gap:14px;padding:14px;background:#F5F5FF;
+  border-radius:8px;margin-bottom:10px;border-left:3px solid #1B1464;}
+.phase-num{flex-shrink:0;width:34px;height:34px;border-radius:50%;
+  background:#1B1464;color:#FFA600;font-family:'Outfit',sans-serif;
+  font-size:.85rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.phase-title{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;
+  color:#1B1464;margin-bottom:2px;}
+.phase-subtitle{font-size:.78rem;color:#003B95;font-style:italic;margin-bottom:6px;font-weight:500;}
+.phase-body{font-size:.8rem;color:#3A3A5A;line-height:1.5;}
+.phase-arrow{text-align:center;font-size:1.1rem;color:#1B1464;
+  margin:4px 0;font-weight:700;opacity:.5;}
+
+/* ── Team Card ───────────────────────────────────────────────── */
+.team-card{background:#fff;border:1px solid #E0E0EE;border-radius:10px;
+  padding:14px;display:flex;gap:12px;align-items:flex-start;}
+.team-avatar{flex-shrink:0;width:42px;height:42px;border-radius:10px;
+  background:#1B1464;color:#FFA600;font-family:'Outfit',sans-serif;
+  font-size:.95rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.team-name{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:#1B1464;}
+.team-role{font-size:.75rem;font-weight:600;color:#003B95;margin-bottom:4px;}
+.team-exp{display:inline-block;font-size:.68rem;font-weight:700;
+  color:#047A1B;background:#E8F8ED;padding:1px 8px;border-radius:999px;margin-bottom:5px;}
+.team-expertise-label{font-size:.68rem;font-weight:700;color:#888;
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;}
+.team-expertise{font-size:.77rem;color:#3A3A5A;line-height:1.4;margin-bottom:5px;}
+.team-impact-label{font-size:.68rem;font-weight:700;color:#888;
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;}
+.team-impact{font-size:.77rem;color:#3A3A5A;line-height:1.45;}
+
+/* ── Next Steps ──────────────────────────────────────────────── */
+.next-step{border:1px solid #E0E0EE;border-radius:10px;padding:14px;
+  margin-bottom:10px;background:#fff;}
+.next-step-header{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.next-step-num{flex-shrink:0;width:32px;height:32px;border-radius:50%;
+  background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;
+  font-size:.85rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.next-step-title{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;}
+.action-label,.outcome-label{font-size:.68rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+.action-label{color:#003B95;}
+.outcome-label{color:#047A1B;}
+.action-text,.outcome-text{font-size:.8rem;color:#3A3A5A;line-height:1.5;margin-bottom:6px;}
+
+/* ── Contact Section ─────────────────────────────────────────── */
+.contact-item{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  border-radius:8px;text-decoration:none;color:#fff;font-size:.82rem;margin-bottom:8px;}
+.contact-icon{flex-shrink:0;width:30px;height:30px;border-radius:7px;
+  background:rgba(255,166,0,.2);color:#FFA600;
+  display:flex;align-items:center;justify-content:center;}
+
+/* ── Bottom Dock ─────────────────────────────────────────────── */
+#bottom-dock{position:fixed;bottom:0;left:0;right:0;z-index:1000;
+  background:rgba(27,20,100,.96);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.12);
+  padding:7px 12px;padding-bottom:max(7px,env(safe-area-inset-bottom));
+  transition:transform .3s ease;}
+#bottom-dock.hidden-down{transform:translateY(110%);}
+.dock-inner{max-width:680px;margin:0 auto;display:grid;
+  grid-template-columns:1.7fr 1fr auto;gap:6px;align-items:center;}
+.dock-btn{display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  color:#fff;border-radius:7px;padding:5px 4px;text-decoration:none;
+  font-size:.65rem;font-weight:600;min-height:40px;justify-content:center;}
+.dock-cta{background:#FFA600;color:#000C1D;border:none;font-weight:800;
+  font-size:.75rem;flex-direction:row;gap:5px;min-height:40px;}
+.dock-top{width:40px;min-height:40px;border-radius:50%;padding:0;
+  flex-direction:row;justify-content:center;}
+
+/* ── Back to Top ─────────────────────────────────────────────── */
+#back-top{position:fixed;bottom:70px;right:14px;z-index:900;
+  display:none;width:38px;height:38px;border-radius:50%;
+  background:#1B1464;color:#fff;border:none;cursor:pointer;
+  align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(27,20,100,.35);}
+#back-top.show{display:flex;}
+
+/* ── Body Padding for fixed header+dock ──────────────────────── */
+body{padding-top:102px;padding-bottom:66px;}
+
+/* ── Print ───────────────────────────────────────────────────── */
+@media print{
+  #sticky-header,#bottom-dock,#back-top,#toc-nav,#progress-bar{display:none!important;}
+  body{padding:0!important;}
+  .acc-body{display:block!important;}
+  .ind-panel{display:block!important;margin-bottom:12px;}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="bottom-dock">
+  <div class="dock-inner">
+    <a class="dock-btn dock-cta" href="https://wa.me/251911202265" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>WhatsApp +251 91120 2265</a>
+    <a class="dock-btn" href="https://wa.me/251911202265?text=Hello%20Addis%20Tech%2C%20I%20would%20like%20to%20book%20an%20Odoo%20ERP%20demo." target="_blank" rel="noopener">Book Demo</a>
+    <a class="dock-btn dock-top" href="#top" aria-label="Back to top"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg></a>
+  </div>
+</div>
+<button id="back-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg></button>
+
+<div id="sticky-header">
+  <div style="max-width:680px;margin:0 auto;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="background:rgba(255,255,255,.12);border-radius:6px;padding:4px;display:flex;">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M3.334 14.166L8.334 9.166L3.334 4.166" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/><path d="M10 15.834H16.6667" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/></svg>
+      </div>
+      <span style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:#fff;">Addis<span style="color:#FFA600;">Tech</span></span>
+      <span style="font-size:.65rem;color:rgba(240,240,255,.55);display:none;" id="doc-label">Odoo ERP Guide</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <a href="index.html" style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25);font-family:'Outfit',sans-serif;font-weight:700;font-size:.7rem;padding:5px 10px;border-radius:9999px;text-decoration:none;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFA600" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Visual View
+      </a>
+      <a href="https://wa.me/251911202265" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;font-weight:700;font-size:.72rem;padding:5px 12px;border-radius:9999px;text-decoration:none;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+  <!-- TOC Nav -->
+  <div id="toc-nav">
+    <div style="max-width:680px;margin:0 auto;padding:0 8px;">
+      <a href="#sec1" class="toc-chip">1. Introduction</a>
+      <a href="#sec2" class="toc-chip">2. ERP Benefits</a>
+      <a href="#sec3" class="toc-chip">3. Why Addis Tech</a>
+      <a href="#sec4" class="toc-chip">4. Why Odoo ERP</a>
+      <a href="#sec5" class="toc-chip">5. Core Applications</a>
+      <a href="#sec6" class="toc-chip">6. Module Profiles</a>
+      <a href="#sec7" class="toc-chip">7. Add-ons &amp; AI</a>
+      <a href="#sec8" class="toc-chip">8. Industries</a>
+      <a href="#sec9" class="toc-chip">9. Implementation</a>
+      <a href="#sec10" class="toc-chip">10. Project Team</a>
+      <a href="#sec11" class="toc-chip">11. Next Steps</a>
+    </div>
+  </div>
+</div>
+
+<div id="top"></div>
+
+<!-- ══ COVER ═════════════════════════════════════════════════ -->
+<div style="background:linear-gradient(160deg,#1B1464 0%,#0B0642 100%);padding:28px 16px 24px 16px;">
+  <div style="max-width:680px;margin:0 auto;">
+    <!-- Brand -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+      <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:5px;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M3.334 14.166L8.334 9.166L3.334 4.166" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/><path d="M10 15.834H16.6667" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/></svg>
+      </div>
+      <span style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;">Addis<span style="color:#FFA600;">Tech</span> <span style="font-weight:400;font-size:.8rem;opacity:.7;">PLC</span></span>
+    </div>
+    <!-- Doc title -->
+    <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:.68rem;font-weight:700;color:#FFA600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Official Document — 9/1/2026</p>
+    <h1 style="font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;line-height:1.25;margin-bottom:8px;">Odoo Enterprise Resource Planning (ERP) System Overview &amp; Implementation Guide</h1>
+    <p style="font-size:.78rem;color:rgba(240,240,255,.75);margin-bottom:18px;font-style:italic;">Business with World-Class Digital Solutions</p>
+    <!-- Tag bullets -->
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;">
+      <div style="display:flex;align-items:flex-start;gap:8px;font-size:.8rem;color:rgba(240,240,255,.9);">
+        <span style="color:#FFA600;font-weight:800;flex-shrink:0;">○</span>
+        Manage your Multiple Business Operations with One System
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;font-size:.8rem;color:rgba(240,240,255,.9);">
+        <span style="color:#FFA600;font-weight:800;flex-shrink:0;">○</span>
+        Automate your Business Operations with One System
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;font-size:.8rem;color:rgba(240,240,255,.9);">
+        <span style="color:#FFA600;font-weight:800;flex-shrink:0;">○</span>
+        Get Auto Generated Reports with Live Dashboards
+      </div>
+    </div>
+    <!-- CTA strip -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="https://wa.me/251911202265" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;font-weight:800;font-size:.8rem;padding:8px 16px;border-radius:9999px;text-decoration:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+        WhatsApp +251 91120 2265
+      </a>
+      <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#1B1464;font-family:'Outfit',sans-serif;font-weight:800;font-size:.8rem;padding:8px 16px;border-radius:9999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Visual Presentation
+      </a>
+      <a href="mailto:info@addistechplc.com" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);color:#fff;font-family:'Outfit',sans-serif;font-weight:600;font-size:.8rem;padding:8px 16px;border-radius:9999px;text-decoration:none;border:1px solid rgba(255,255,255,.2);">
+        info@addistechplc.com
+      </a>
+    </div>
+  </div>
+</div>
+
+<div id="sec1" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="sec-pill">1</span>
+    <h2 class="sec-title">Introduction &amp; Executive Context</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <div class="callout">
+    Navigating digital transformation requires localized ERP solutions that align directly with Ethiopian statutory tax laws, fiscal calendars, and commercial operating realities.
+  </div>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:12px;">
+    In today&rsquo;s fast-evolving commercial landscape, Ethiopian organizations often face operational friction caused by fragmented workflows and manual administration. Key business functions&mdash;such as sales, procurement, inventory, manufacturing, human resources, and financial management&mdash;are inherently interdependent. However, when operated in isolated departmental silos, organizations encounter administrative bottlenecks, redundant data entry, routine errors, and inflated operating costs.
+  </p>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:16px;">
+    Navigating digital transformation can also present significant challenges for local enterprises. Off-the-shelf global software frequently fails to deliver expected outcomes because it lacks local customization and does not align with the operational practices, statutory tax requirements, and commercial realities of the Ethiopian market.
+  </p>
+
+  <p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin-bottom:8px;">The Enterprise Resource Planning (ERP) Solution</p>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:12px;">
+    An <strong>Enterprise Resource Planning (ERP)</strong> system resolves operational challenges by consolidating company data into a single, unified platform. Rather than maintaining separate applications for each department, an ERP automates routine operational tasks and facilitates seamless cross-departmental information flow without manual intervention.
+  </p>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;">
+    <strong>Addis Tech PLC</strong> bridges business operations with modern technology by delivering end-to-end digital transformation tailored specifically for the Ethiopian enterprise landscape. By combining deep business consulting with dedicated software engineering, Addis Tech extends beyond simple software implementation to re-engineer core processes for sustainable competitive advantage.
+  </p>
+</div>
+<div style="border-top:6px solid #F0F0FA;"></div>
+
+<div id="sec2" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="sec-pill">2</span>
+    <h2 class="sec-title">Benefits of an ERP System</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:16px;">
+    Implementing an Enterprise Resource Planning (ERP) system provides organizations with a robust foundation for modernizing operational workflows and driving sustainable business growth. Below are the core benefits and objectives achieved through ERP integration:
+  </p>
+
+  <div style="display:flex;flex-direction:column;">
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Provides Real-time Information and Data: </span><span class="feat-desc">An ERP systematically unifies business data and information flow across all departments.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Improved Collaboration: </span><span class="feat-desc">Provides cross-departmental data access to eliminate communication silos and help employees see the big picture.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Allows for Increased Productivity: </span><span class="feat-desc">Eliminates repetitive manual tasks, saving valuable time so staff can focus on core business growth.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Total Visibility: </span><span class="feat-desc">Delivers complete visibility into key processes for staff and leadership based on customized access permissions.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Improved Reporting and Planning: </span><span class="feat-desc">Unifies reporting across all functions, enabling seamless cross-departmental analysis without messy spreadsheets.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Customer Service: </span><span class="feat-desc">Centralizes client information so sales teams can focus on customer relationships rather than manual data entry.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Data Security and Quality: </span><span class="feat-desc">Enhances collaboration through centralized data while enforcing granular role-based permissions and robust intrinsic security controls.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Improved Collaboration and Workflows: </span><span class="feat-desc">Funnels interdepartmental data into one central location, giving teams instant access to the information they need to collaborate seamlessly.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Standardized Business Processes: </span><span class="feat-desc">Adopts proven industry best practices to help businesses standardize operations and boost overall efficiency.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Facilitated Regulatory Compliance: </span><span class="feat-desc">Simplifies compliance using validated data and automated reporting tools that drastically lower audit costs.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Superior Scalability: </span><span class="feat-desc">Having a system in place that can elegantly and efficiently accommodate a company&rsquo;s growth is of the utmost importance, and the right ERP system makes it easy.</span></div>
+    </div>
+  </div>
+</div>
+<div style="border-top:6px solid #F0F0FA;"></div>
+
+<div id="sec3" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="sec-pill">3</span>
+    <h2 class="sec-title">Why Choose Addis Tech?</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:16px;">
+    Backed by its hands-on World-class systems and functional consultants, Addis Tech PLC combines advanced system development with specialized software engineering to re-engineer business processes for long-term competitive advantage. Rather than simply deploying software, Addis Tech assesses unique business requirements to implement internationally proven ERP systems adapted specifically to the Ethiopian commercial and regulatory context.
+  </p>
+
+  <div style="display:flex;flex-direction:column;">
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Integrates All Key Business Functions: </span><span class="feat-desc">Connects interlinked operations across all departments into a single centralized database, eliminating administrative bottlenecks and manual processes.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Automated Real-Time Information Flow: </span><span class="feat-desc">Modules share data automatically without human intervention, delivering real-time operational visibility and fostering seamless interdepartmental communication.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Tailored to the Ethiopian Business Context: </span><span class="feat-desc">Global ERP solutions are customized and reconfigured to align with local Ethiopian operating requirements, tax frameworks, and business perspectives.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Modular &amp; Tailored Implementation: </span><span class="feat-desc">Deployments follow a phased approach, identifying and implementing the highest-priority modules first to maximize immediate business value.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Future-Proof Scalability: </span><span class="feat-desc">Flexible system architecture enables organizations to seamlessly integrate new modules or connect third-party applications as business operations expand.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Affordable &amp; High-ROI Pricing: </span><span class="feat-desc">Delivers feature-rich, world-class ERP software at cost-effective rates designed to make digital transformation accessible.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Cloud &amp; Mobile Mobility: </span><span class="feat-desc">Supports both local network installations and cloud-hosted environments, allowing secure system access from any device, anywhere with an internet connection.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Flexible Deployment Options (Full or Partial): </span><span class="feat-desc">Accommodates step-by-step module rollouts for growing enterprises as well as full core suite implementations for established businesses.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Internationally Proven Platforms: </span><span class="feat-desc">Exclusively implements globally recognized ERP systems tested over decades&mdash;such as Odoo, which features over 7 million active users, 100+ modules, 17+ years of refinement, and support for up to 10,000 active users simultaneously.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Service Guarantee: </span><span class="feat-desc">Backed by 100% confidence in system reliability, providing a complimentary 1-year warranty to fix any system errors free of charge.</span></div>
+    </div>
+  </div>
+</div>
+<div style="border-top:6px solid #F0F0FA;"></div>
+
+<div id="sec4" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="sec-pill">4</span>
+    <h2 class="sec-title">Why Odoo ERP?</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <p style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;color:#003B95;font-style:italic;margin-bottom:12px;">The Smart, Reliable, and Future-Proof Choice for Ethiopian Businesses.</p>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:14px;">
+    Running a business in Ethiopia comes with unique practical challenges. Most business owners find themselves stuck between two bad options:
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:35%;">Legacy / Traditional Option</th>
+          <th>Operational Disadvantages &amp; Bottlenecks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Basic, Disconnected Systems</strong><br><em style="font-size:.75rem;color:#888;">(e.g., Peachtree, Excel)</em></td>
+          <td>Cannot talk to warehouse, store, or purchasing teams. Staff spend hours entering the same numbers twice, leading to missing stock, tax filing mistakes, and lost money.</td>
+        </tr>
+        <tr>
+          <td><strong>Big Legacy Software</strong><br><em style="font-size:.75rem;color:#888;">(e.g., SAP, Oracle)</em></td>
+          <td>Built for massive global conglomerates, demand huge sums of scarce foreign currency upfront, take over a year to set up, and are far too complicated for local staff.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin:14px 0;">
+    <strong>Odoo ERP gives you the best of both worlds.</strong> It brings your entire company&mdash;sales, warehouse, accounting, purchasing, and staff records&mdash;into one unified, easy-to-use system accessible from your computer or mobile phone.
+  </p>
+
+  <p style="font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:#1B1464;margin-bottom:10px;">Key Advantages of Odoo ERP</p>
+
+  <div style="display:flex;flex-direction:column;">
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Fully Ready for Ethiopian Taxes &amp; E-Invoicing: </span><span class="feat-desc">Odoo accounting replaces tools like Peachtree with higher accuracy, less manual work, and direct warehouse/sales integration. It easily handles Ministry of Revenues (MOR) tax rules&mdash;including VAT, Withholding Tax, and fiscal printers&mdash;and fully supports upcoming e-receipt and e-invoicing standards.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Native Amharic Support &amp; Local Fiscal Calendars: </span><span class="feat-desc">Odoo supports Amharic natively, making it comfortable for all team members, with plans to add more local languages. It can also be configured to match your specific business tax year and reporting periods.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">World-Class Global Trust &amp; Scale: </span><span class="feat-desc">Odoo is trusted globally by over 28 million active users across 200,000+ organizations. Its robust architecture smoothly supports up to 100,000 active users simultaneously without performance loss. Odoo provides over 50,000 training videos and detailed user guides to help your staff master every tool at their own pace. Your business never gets left in the dark.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Easy to Use on Any Device (Even Mobile Phones): </span><span class="feat-desc">Designed like a modern smartphone app, Odoo ensures high user adoption. Managers can track approvals, sales, and inventory directly from their mobile devices anytime.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Enterprise-Grade Security &amp; Auto Backup: </span><span class="feat-desc">Protect financial and customer data using two-factor authentication (2FA), granular access controls, and automated data backups.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Endless Customization &amp; Seamless Integrations: </span><span class="feat-desc">Odoo can be tailored to match your exact business rules and connects smoothly with external software or local payment platforms like Telebirr via API integrations.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Continuous Yearly Upgrades: </span><span class="feat-desc">Major yearly updates introduce new features, boost processing speeds, and enhance security to keep your business running on modern technology.</span></div>
+    </div>
+  </div>
+</div>
+<div style="border-top:6px solid #F0F0FA;"></div>
+
+<div id="sec5" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="sec-pill">5</span>
+    <h2 class="sec-title">Core Odoo ERP Applications</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin-bottom:10px;">All Your Business Tools Working as One</p>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:14px;">
+    In many Ethiopian companies, departments operate in silos: sales writes paper slips, warehouse staff keep private notebooks, accountants retype figures into Peachtree, and projects are tracked on scattered spreadsheets. This causes costly inventory errors, billing delays, and budget overruns.
+  </p>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:18px;">
+    Odoo ERP unites your entire business into one connected platform. Addis Tech organizes Odoo&rsquo;s core applications into three operational categories:
+  </p>
+
+  <!-- 3-Category Table -->
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:28%;">Category</th>
+          <th style="width:32%;">Strategic Focus</th>
+          <th>Included Core Modules</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1: Finance &amp; Control</strong></td>
+          <td>Stay compliant, safeguard cash flow, and maintain total financial clarity.</td>
+          <td>Accounting &amp; Invoicing<br>Budget Management<br>HR &amp; Payroll</td>
+        </tr>
+        <tr>
+          <td><strong>2: Operations &amp; Supply Chain</strong></td>
+          <td>Eliminate stock losses, streamline purchasing, and track true production costs.</td>
+          <td>Inventory &amp; Warehouses<br>Purchasing &amp; Vendors<br>Manufacturing (MRP)<br>Project Management</td>
+        </tr>
+        <tr>
+          <td><strong>3: Sales &amp; Customer Growth</strong></td>
+          <td>Sell across retail counters, enterprise sales teams, and digital channels.</td>
+          <td>Sales &amp; Point of Sale (POS)<br>Customer Management (CRM)<br>Website &amp; E-Commerce</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Category 1 -->
+  <div style="margin-top:20px;">
+    <p style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;margin-bottom:10px;padding:6px 10px;background:#E5F0FC;border-left:3px solid #003B95;border-radius:0 4px 4px 0;">&#128202; 1. Finance &amp; Control</p>
+    <p style="font-size:.82rem;color:#555;font-style:italic;margin-bottom:10px;">Stay compliant, safeguard cash flow, and maintain total financial clarity.</p>
+    <div style="display:flex;flex-direction:column;">
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Accounting &amp; Invoicing: </span><span class="feat-desc">Replaces legacy tools like Peachtree with a live ledger configured for Ethiopian taxes (VAT, Withholding), upcoming e-invoicing standards, fiscal printers, Amharic menus, and local fiscal years.</span></div>
+      </div>
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Budget Management: </span><span class="feat-desc">Tracks planned versus actual spending in real time across branches and departments, preventing overspending before cash leaves your account.</span></div>
+      </div>
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">HR &amp; Payroll: </span><span class="feat-desc">Centralizes staff files and attendance while automating monthly payroll in full compliance with Ethiopian income tax brackets and pension laws (7% employee / 11% employer).</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category 2 -->
+  <div style="margin-top:16px;">
+    <p style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;margin-bottom:10px;padding:6px 10px;background:#E5F0FC;border-left:3px solid #003B95;border-radius:0 4px 4px 0;">&#128230; 2. Operations &amp; Supply Chain</p>
+    <p style="font-size:.82rem;color:#555;font-style:italic;margin-bottom:10px;">Eliminate stock losses, streamline purchasing, and track true production costs.</p>
+    <div style="display:flex;flex-direction:column;">
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Inventory &amp; Warehouses: </span><span class="feat-desc">Delivers live stock tracking across multiple shops and depots with automated reordering, mobile barcode scanning, and landed cost tracking for imports.</span></div>
+      </div>
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Purchasing &amp; Vendors: </span><span class="feat-desc">Standardizes requisitions and uses 3-way matching (order, warehouse receipt, vendor bill) to eliminate duplicate or erroneous supplier payments.</span></div>
+      </div>
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Manufacturing (MRP): </span><span class="feat-desc">Manages multi-level recipe sheets (Bills of Materials), tracks shop-floor tasks, and calculates true finished-product unit costs from raw materials and labor.</span></div>
+      </div>
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Project Management: </span><span class="feat-desc">Organizes complex contracts using visual task boards, linking deliverables directly to field timesheets, materials used, and client invoicing.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category 3 -->
+  <div style="margin-top:16px;">
+    <p style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;margin-bottom:10px;padding:6px 10px;background:#E5F0FC;border-left:3px solid #003B95;border-radius:0 4px 4px 0;">&#128200; 3. Sales &amp; Customer Growth</p>
+    <p style="font-size:.82rem;color:#555;font-style:italic;margin-bottom:10px;">Sell across retail counters, enterprise sales teams, and digital channels.</p>
+    <div style="display:flex;flex-direction:column;">
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Sales &amp; Point of Sale (POS): </span><span class="feat-desc">Powers quick retail and wholesale checkouts with local payment support (cash, Telebirr, CBE Birr) and offline selling during internet cuts.</span></div>
+      </div>
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Customer Management (CRM): </span><span class="feat-desc">Captures customer inquiries into a visual pipeline, tracks sales team follow-ups, and forecasts upcoming revenue so deals are never lost.</span></div>
+      </div>
+      <div class="feat-item">
+        <span class="feat-dot">●</span>
+        <div><span class="feat-title">Website &amp; E-Commerce: </span><span class="feat-desc">Launches an online storefront synced live with warehouse stock, generating orders and invoices automatically while accepting local and international payments.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div style="border-top:6px solid #F0F0FA;"></div>
+
+<div id="sec6" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="sec-pill">6</span>
+    <h2 class="sec-title">Detailed Odoo ERP Module Profiles</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <!-- 6.1 Accounting -->
+  <div class="acc-item open" id="acc-6-1">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-1')">
+      <span class="acc-num">6.1</span>
+      <span class="acc-name">Odoo Accounting &amp; Invoicing</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Your Complete Financial Hub Built for Ethiopian Compliance.</p>
+      <p class="acc-intro">Odoo Accounting modernizes your finance department, replacing older programs like Peachtree and unlinked spreadsheets. It connects your bank accounts, daily sales, vendor bills, and warehouse stock into one live ledger. Every transaction records automatically, keeping your books balanced without double entry while staying fully compliant with Ministry of Revenues (MOR) regulations.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Ethiopian Tax Ready: </span><span class="feat-desc">Pre-configured rules for VAT (15%), Withholding Tax (2% goods / 30% services), and simple monthly deduction reports.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">E-Invoicing &amp; Fiscal Devices: </span><span class="feat-desc">Ready for Ethiopia's upcoming electronic invoicing rules and connects smoothly with certified fiscal cash registers.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Amharic &amp; Local Calendars: </span><span class="feat-desc">Full support for the Amharic language and configurable for Ethiopian fiscal years (Hamle to Sene).</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automated Bank Reconciliation: </span><span class="feat-desc">Quickly match bank and Telebirr statements with your internal sales and payment records.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Instant Financial Reports: </span><span class="feat-desc">Generate Profit &amp; Loss statements, Balance Sheets, and Trial Balances with a single click.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Credit &amp; Bill Control: </span><span class="feat-desc">Set customer credit limits, send payment reminders, and match vendor bills to warehouse receipts before releasing funds.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.2 Inventory -->
+  <div class="acc-item" id="acc-6-2">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-2')">
+      <span class="acc-num">6.2</span>
+      <span class="acc-name">Odoo Inventory &amp; Warehouse Management</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Complete, Real-Time Control Over Your Stock and Stores.</p>
+      <p class="acc-intro">Odoo Inventory gives business owners direct visibility over all goods from supplier delivery to final sale. It tracks stock across multiple locations, prevents theft and unexplained shortages, alerts you before popular items run out, and ensures your balance sheet shows the exact financial value of goods on hand.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Multi-Store Management: </span><span class="feat-desc">Track inventory across multiple shops, central warehouses, and regional branches on one screen.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automatic Low-Stock Warnings: </span><span class="feat-desc">Get instant alerts or automated purchase drafts before essential items run out.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Barcode &amp; Mobile Scanning: </span><span class="feat-desc">Receive goods, pack orders, and count inventory rapidly using mobile phones or barcode scanners.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Landed Cost for Importers: </span><span class="feat-desc">Add customs duty, transit fees, and shipping costs directly to the true unit price of imported goods.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Batch, Lot &amp; Serial Numbers: </span><span class="feat-desc">Track expiration dates for sensitive products (food, pharmaceuticals) or serial numbers for machinery.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Simple Stock Audits: </span><span class="feat-desc">Perform cyclic inventory counts quickly without pausing your normal daily business operations.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.3 Purchasing -->
+  <div class="acc-item" id="acc-6-3">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-3')">
+      <span class="acc-num">6.3</span>
+      <span class="acc-name">Odoo Purchasing &amp; Vendor Management</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Take Full Control Over Company Spending and Supplier Orders.</p>
+      <p class="acc-intro">Odoo Purchase helps you manage company expenditures before money leaves your account. Instead of using informal phone calls or paper purchase slips, your team can request items, compare supplier prices, and issue professional purchase orders within one connected system. It links directly with your warehouse and accounting teams, ensuring you pay only for items that have actually arrived in good condition.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Clear Purchase Requests: </span><span class="feat-desc">Staff can submit item requisitions digitally with mandatory manager approvals before orders are placed.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Supplier Price Comparisons: </span><span class="feat-desc">Send requests for quotations (RFQs) to multiple local vendors at once to easily compare prices, payment terms, and delivery schedules.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automated Purchase Orders: </span><span class="feat-desc">Turn approved quotes into official, printable purchase orders with one click.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">3-Way Matching: </span><span class="feat-desc">Protect company cash by checking your purchase order, warehouse receipt, and vendor bill together to stop overbilling and duplicate payments.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Vendor Performance Records: </span><span class="feat-desc">Track which local or overseas suppliers deliver on time, offer the best prices, and provide consistent quality.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Import &amp; Forex Tracking: </span><span class="feat-desc">Manage international supplier orders, track shipments in transit, and record foreign currency costs alongside local expenses.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.4 Sales & POS -->
+  <div class="acc-item" id="acc-6-4">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-4')">
+      <span class="acc-num">6.4</span>
+      <span class="acc-name">Odoo Sales &amp; Point of Sale (POS)</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Close Deals Faster and Run Fast, Modern Checkout Counters.</p>
+      <p class="acc-intro">Odoo Sales equips your wholesale agents, showroom staff, and retail cashiers to serve customers quickly and accurately. Whether issuing quotations for large enterprise orders or ringing up quick retail transactions at a shop counter, the system automatically checks live stock levels and calculates correct prices. Your cashiers can keep working even during internet cuts, syncing transactions the moment connectivity returns.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Instant Quotations &amp; Price Lists: </span><span class="feat-desc">Create clean, branded quotes in seconds with custom pricing rules for retail, wholesale, or corporate clients.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Fast Touchscreen POS: </span><span class="feat-desc">Run simple, modern checkout counters for retail shops, supermarkets, and restaurants on computers, tablets, or phones.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Local Payment Support: </span><span class="feat-desc">Accept multiple payment options at checkout, including cash, Telebirr, CBE Birr, and bank transfers, with instant receipt printing.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Offline Selling Mode: </span><span class="feat-desc">Continue scanning barcodes, making sales, and printing receipts even if the internet goes down; data syncs automatically once reconnected.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automated Stock Reservations: </span><span class="feat-desc">Placing an order reserves items in the warehouse immediately, preventing sales teams from promising out-of-stock products.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Sales Team Tracking: </span><span class="feat-desc">Monitor individual sales rep performance, calculate commissions, and view real-time sales revenue dashboards.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.5 CRM -->
+  <div class="acc-item" id="acc-6-5">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-5')">
+      <span class="acc-num">6.5</span>
+      <span class="acc-name">Odoo Customer Relationship Management (CRM)</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Turn Leads into Loyal Clients and Never Lose a Business Deal.</p>
+      <p class="acc-intro">Odoo CRM organizes your client communications and sales pipelines in one visible place. Instead of relying on memory, scattered notebooks, or personal phone contacts, your sales managers can monitor every business opportunity from the first inquiry to the signed contract. It gives business owners full visibility into their sales pipeline, team follow-ups, and expected monthly revenue.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Visual Sales Pipeline: </span><span class="feat-desc">View all active customer deals on a clear, drag-and-drop board categorized by stage (New, Qualified, Proposal Sent, Won).</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automated Lead Capture: </span><span class="feat-desc">Collect new customer inquiries automatically from your website, email, or social media campaigns into your sales pipeline.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Follow-up Reminders: </span><span class="feat-desc">Schedule calls, meetings, product demos, and quotation follow-ups so no client inquiry is ever forgotten.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Complete Customer History: </span><span class="feat-desc">Keep a unified log of client phone notes, quotation histories, past purchases, and preferences accessible to your entire team.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Revenue Forecasting: </span><span class="feat-desc">Predict upcoming monthly cash flow and expected revenue based on the probability of open deals.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Lost Deal Analysis: </span><span class="feat-desc">Record why certain deals were lost (such as price or delivery time) to help management refine sales strategies.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.6 HR & Payroll -->
+  <div class="acc-item" id="acc-6-6">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-6')">
+      <span class="acc-num">6.6</span>
+      <span class="acc-name">Odoo Human Resources &amp; Payroll</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Organize Your Workforce and Automate Ethiopian Payroll.</p>
+      <p class="acc-intro">Odoo HR brings all employee information, attendance records, and monthly compensation into a single, private dashboard. It eliminates messy paper personnel files and manual payroll spreadsheets, reducing administrative workload while maintaining strict confidentiality. Configured to align with Ethiopian labor regulations, the system calculates income taxes and pension deductions accurately and issues compliant payslips on time.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Central Employee Directory: </span><span class="feat-desc">Store job contracts, identification documents, emergency contacts, and department assignments in secure digital profiles.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Ethiopian Payroll Rules: </span><span class="feat-desc">Automatically compute employment income tax based on progressive tax brackets, employee pension (7%), and employer pension contributions (11%).</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Attendance &amp; Shift Management: </span><span class="feat-desc">Track daily employee check-ins and check-outs via biometric devices, RFID cards, or mobile check-in tools.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Leave &amp; Holiday Approvals: </span><span class="feat-desc">Staff can request annual leave, sick days, or maternity leave online, with automated manager approvals and real-time leave balance tracking.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Direct Bank Disbursals: </span><span class="feat-desc">Generate summary payment files ready for corporate salary disbursements through commercial banks or mobile wallets like Telebirr.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Expense Reimbursements: </span><span class="feat-desc">Enable field workers and staff to submit expense claims and fuel receipts from their phones for quick management verification and repayment.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.7 Manufacturing -->
+  <div class="acc-item" id="acc-6-7">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-7')">
+      <span class="acc-num">6.7</span>
+      <span class="acc-name">Odoo Manufacturing &amp; Production (MRP)</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Streamline Production Lines, Control Raw Materials, and Track Costs.</p>
+      <p class="acc-intro">Odoo Manufacturing is built for assembly plants, food processors, metal fabricators, and industrial workshops. It connects your workshop floor directly with your raw material stores and finance office. Instead of guessing how much each product costs to make, the system tracks raw ingredient usage, work hours, and scrap rates automatically, giving owners clear insight into actual production profitability.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Bills of Materials (BOM): </span><span class="feat-desc">Define exact product recipe cards and ingredient lists, including multi-stage assemblies and sub-components.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automated Raw Material Reservations: </span><span class="feat-desc">Automatically allocate raw goods from inventory as soon as a manufacturing work order is scheduled.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Shop Floor Work Orders: </span><span class="feat-desc">Assign step-by-step tasks to specific machines or worker stations, tracking start times, pause intervals, and final output.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">True Unit Cost Tracking: </span><span class="feat-desc">Automatically calculate finished product costs by combining raw material purchases, direct labor hours, and machine electricity/overhead.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Scrap &amp; Waste Management: </span><span class="feat-desc">Log material loss, waste, or defective output during production runs to pinpoint operational bottlenecks.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Quality Checkpoints: </span><span class="feat-desc">Set mandatory quality control steps before goods leave the production line and enter finished goods inventory.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.8 Budget -->
+  <div class="acc-item" id="acc-6-8">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-8')">
+      <span class="acc-num">6.8</span>
+      <span class="acc-name">Odoo Budget Management</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Maintain Financial Discipline and Monitor Real Expenses in Real Time.</p>
+      <p class="acc-intro">Odoo Budget Management helps executives and finance managers plan ahead, avoid unauthorized expenditures, and maintain company-wide financial control. By linking budgets directly to the general ledger, the system compares your planned figures against actual transactions automatically. You can monitor company budgets by department, specific project, cost center, or revenue account without building complex external spreadsheets.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Departmental &amp; Project Budgets: </span><span class="feat-desc">Set monthly, quarterly, or annual spending and revenue limits for distinct business units, branches, or initiatives.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Live Planned vs. Actual Comparisons: </span><span class="feat-desc">View actual income and expense figures side-by-side with your initial targets with zero manual data collation.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Early Overspending Warnings: </span><span class="feat-desc">Track ongoing spending trends and receive alerts when actual expenditures approach or exceed allocated budget lines.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Flexible Analytical Cost Centers: </span><span class="feat-desc">Tag daily purchase invoices and operational expenses to specific branch or project cost centers for granular tracking.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Multi-Period Financial Planning: </span><span class="feat-desc">Create parallel budgets for optimistic, conservative, or baseline annual operational projections.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Management Decision Dashboards: </span><span class="feat-desc">Clean, color-coded visual reports show current budget usage percentages at a glance.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.9 Project -->
+  <div class="acc-item" id="acc-6-9">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-9')">
+      <span class="acc-num">6.9</span>
+      <span class="acc-name">Odoo Project Management</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Deliver Customer Work on Schedule and Keep Project Costs Under Control.</p>
+      <p class="acc-intro">Odoo Project Management helps contractors, service firms, and technical teams plan, assign, and execute client deliverables transparently. Instead of tracking work progress through disconnected chat groups and phone calls, teams manage tasks on shared visual boards. It links directly with employee timesheets, customer billing, and material procurement, giving leadership clear oversight over project margins.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Visual Kanban Task Boards: </span><span class="feat-desc">Organize project deliverables by stages (such as Planning, In Progress, Review, and Completed) with drag-and-drop ease.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Gantt Charts &amp; Milestones: </span><span class="feat-desc">Map out complex project schedules, set critical milestone deadlines, and track dependencies between tasks visually.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Employee Timesheets: </span><span class="feat-desc">Field teams and technical staff can record hours worked per task using mobile devices or desktop timers.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automated Project Invoicing: </span><span class="feat-desc">Issue client invoices based on project milestones, fixed-contract terms, or billable hourly timesheet rates with one click.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Project Material Consumption: </span><span class="feat-desc">Link specific warehouse items or site expenses directly to a project code to calculate true project net profit.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Document Sharing &amp; Client Portals: </span><span class="feat-desc">Share project updates, drawings, and approval sheets with clients and site supervisors through dedicated portals.</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6.10 Website & E-Commerce -->
+  <div class="acc-item" id="acc-6-10">
+    <button class="acc-trigger" onclick="toggleAcc('acc-6-10')">
+      <span class="acc-num">6.10</span>
+      <span class="acc-name">Odoo Website &amp; E-Commerce</span>
+      <span class="acc-chevron">&#9660;</span>
+    </button>
+    <div class="acc-body">
+      <p class="acc-subtitle">Build Your Online Store and Sell Directly into Your ERP.</p>
+      <p class="acc-intro">Odoo Website and E-Commerce allows you to launch a modern company website and online shop that links directly to your warehouse and accounting. Instead of using disconnected third-party website builders that force staff to manually re-enter online orders, Odoo connects your digital storefront with your internal business operations. When a customer buys an item online, your inventory drops automatically, an invoice is generated, and your fulfillment team is notified to dispatch the delivery.</p>
+      <p class="acc-features-label">Key Features:</p>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Drag-and-Drop Website Builder: </span><span class="feat-desc">Create clean, mobile-friendly web pages and product catalogs easily without needing complex coding skills.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Direct Inventory Sync: </span><span class="feat-desc">Product quantities update live on your website; items that run out of stock in your warehouse automatically show as unavailable online to prevent unfulfillable orders.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Local &amp; Global Payment Gateways: </span><span class="feat-desc">Accept orders smoothly using local payment integrations (such as Telebirr, CBE Birr, and local bank transfers) alongside international credit cards (Visa, Mastercard) for diaspora or foreign buyers.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Customer Self-Service Portals: </span><span class="feat-desc">Shoppers and corporate clients can log in to view their order status, download past tax invoices, track deliveries, and submit repeat orders.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Automated Order Fulfillment: </span><span class="feat-desc">Online purchases instantly generate sales orders, packing slips, and draft invoices inside your central ERP with zero manual data entry.</span></div></div>
+      <div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">B2B &amp; B2C Pricing Rules: </span><span class="feat-desc">Display standard retail pricing to regular visitors while automatically showing negotiated wholesale discounts to logged-in corporate accounts.</span></div></div>
+    </div>
+  </div>
+
+</div>
+<div style="border-top:6px solid #F0F0FA;"></div>
+
+<div id="sec7" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span class="sec-pill">7</span>
+    <h2 class="sec-title">Additional Modules &amp; Custom Solutions</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin-bottom:10px;">Growing Beyond the Basics with AI and Custom Workflows.</p>
+
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:10px;">
+    Your business does not stop at standard accounting or inventory. As your company expands, you encounter specific operational demands that off-the-shelf software cannot handle. Odoo provides an ecosystem of over 100+ ready-to-use business modules, built-in free communication tools, native AI integration, and an architecture that allows Addis Tech to build custom modules tailored specifically to your company&rsquo;s unique daily operations.
+  </p>
+
+  <div class="callout" style="margin-bottom:16px;">
+    <strong>Artificial Intelligence &amp; Custom Workflow Integration</strong><br>
+    Leverage native AI for automatic OCR receipt scanning, document data extraction, and automated email proposal drafting. Addis Tech also builds clean, upgrade-safe custom modules tailored specifically to your unique operational rules.
+  </div>
+
+  <!-- 7.1 Team Chat -->
+  <p style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;margin-bottom:8px;margin-top:16px;">7.1. Free Built-In Team Chat &amp; Internal Communication</p>
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:10px;">Keep your entire organization connected inside a single secure workspace without buying expensive third-party messaging subscriptions:</p>
+  <div style="display:flex;flex-direction:column;">
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Odoo Discuss (Free Company Chat): </span><span class="feat-desc">A direct, built-in communication tool for your entire staff. Create private team channels (such as Finance, Sales Addis, or Warehouse), send direct messages, and eliminate chaotic external WhatsApp or Telegram chat groups.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Document Chatter: </span><span class="feat-desc">Chat directly under any specific document. Your accountant, storekeeper, and sales rep can write notes, tag each other, and attach delivery receipts directly under an active invoice or purchase order.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Live Website Chat: </span><span class="feat-desc">Engage visitors browsing your online shop or company website in real time and automatically turn chats into sales leads.</span></div>
+    </div>
+  </div>
+
+  <!-- 7.2 AI -->
+  <p style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;margin-bottom:8px;margin-top:16px;">7.2. Built-In Artificial Intelligence (AI) Integration</p>
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:10px;">Odoo integrates modern AI capabilities directly into your daily business processes to speed up routine office work:</p>
+  <div style="display:flex;flex-direction:column;">
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Smart Document &amp; Receipt Scanning: </span><span class="feat-desc">AI automatically reads printed supplier invoices and receipts, extracts the vendor name, date, items, and totals, and drafts the accounting entry for you.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Automated Customer Email &amp; Proposal Drafts: </span><span class="feat-desc">Draft professional client quotations, follow-up messages, and marketing emails using AI text assistance directly inside your sales system.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">AI Chatbots &amp; Helpdesk: </span><span class="feat-desc">Connect intelligent AI assistants (such as ChatGPT or custom AI engines) to answer standard client questions, handle support tickets, and route complex inquiries to your staff.</span></div>
+    </div>
+  </div>
+
+  <!-- 7.3 100+ Modules -->
+  <p style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;margin-bottom:8px;margin-top:16px;">7.3. Access to 100+ Specialized Ready-to-Deploy Modules</p>
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:10px;">Beyond core operations, you can activate specialized modules with a single click whenever your business is ready:</p>
+  <div style="display:flex;flex-direction:column;">
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Fleet &amp; Vehicle Management: </span><span class="feat-desc">Track company vehicles, monitor fuel consumption, schedule regular maintenance, and log driver assignments.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Quality Control &amp; Inspections: </span><span class="feat-desc">Set mandatory quality checks for imported shipments or finished manufactured items before they enter inventory.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Maintenance &amp; Repair: </span><span class="feat-desc">Schedule equipment servicing for factory machines, delivery trucks, or retail POS hardware to prevent costly breakdowns.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Barcode &amp; Document Management: </span><span class="feat-desc">Digitize physical paperwork, store scanned trade licenses and contracts, and automate mobile barcode operations.</span></div>
+    </div>
+  </div>
+
+  <!-- 7.4 Custom Dev -->
+  <p style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#1B1464;margin-bottom:8px;margin-top:16px;">7.4. Custom Module Development by Addis Tech</p>
+  <p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:10px;">Every business has unique daily routines. When your operations require a specific process that no standard software offers, Addis Tech builds clean, purpose-built custom modules directly on top of your Odoo system:</p>
+  <div style="display:flex;flex-direction:column;">
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Built for Your Exact Workflow: </span><span class="feat-desc">Whether you need a multi-level clearance system for import containers, a unique loyalty program for wholesale buyers, or specialized agricultural collection sheets, we build the exact screens and logic your team needs.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Seamless Local Integrations: </span><span class="feat-desc">We connect your Odoo platform with custom external systems, local bank payment APIs, or Telebirr gateways without disrupting standard accounting.</span></div>
+    </div>
+    <div class="feat-item">
+      <span class="feat-dot">●</span>
+      <div><span class="feat-title">Clean &amp; Upgrade-Safe: </span><span class="feat-desc">We develop using standard Odoo frameworks so your custom features continue working smoothly when the system receives its regular yearly updates.</span></div>
+    </div>
+  </div>
+</div>
+<div style="border-top:6px solid #F0F0FA;"></div>
+<div id="sec8" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span class="sec-pill">8</span><h2 class="sec-title">Industries Covered by Odoo ERP</h2></div><hr class="sec-rule"><p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin-bottom:10px;">Built for the Realities of the Ethiopian Economy.</p><p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:14px;">One of Odoo&rsquo;s greatest strengths is its versatility. Whether you are moving imported goods through customs, running retail checkout counters, managing a production plant, or handling contracting projects, Odoo provides pre-configured workflows tailored to your sector:</p><div class="ind-tabs"><button class="ind-tab active" data-tab="0" onclick="showInd(0)">8.1&nbsp;Wholesale, Distribution &amp; Import/Export</button><button class="ind-tab" data-tab="1" onclick="showInd(1)">8.2&nbsp;Manufacturing &amp; Agro-Processing</button><button class="ind-tab" data-tab="2" onclick="showInd(2)">8.3&nbsp;Construction, Engineering &amp; Contracting</button><button class="ind-tab" data-tab="3" onclick="showInd(3)">8.4&nbsp;Retail Chains, Supermarkets &amp; Showrooms</button><button class="ind-tab" data-tab="4" onclick="showInd(4)">8.5&nbsp;Professional Services, Consulting &amp; NGOs</button><button class="ind-tab" data-tab="5" onclick="showInd(5)">8.6&nbsp;Healthcare, Clinics &amp; Pharmaceuticals</button></div><div style="background:#fff;border:1px solid #E0E0EE;border-radius:8px;padding:12px 14px;"><div class="ind-panel active" id="ind-0"><p class="ind-panel-title">8.1. Wholesale, Distribution &amp; Import/Export</p><p class="ind-panel-intro">For general importers, FMCG distributors, building material suppliers, and regional traders.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Landed Cost Calculations: </span><span class="feat-desc">Accurately distribute import costs&mdash;such as maritime shipping, transit fees, customs duties, and local warehouse transport&mdash;directly onto the true unit cost of your goods.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Multi-Warehouse Logistics: </span><span class="feat-desc">Manage central storage hubs in Addis Ababa alongside regional distribution stores across Ethiopia on one screen.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Credit &amp; Wholesale Pricing: </span><span class="feat-desc">Set custom credit limits for wholesale distributors and manage tiered price lists for high-volume buyers.</span></div></div></div><div class="ind-panel" id="ind-1"><p class="ind-panel-title">8.2. Manufacturing &amp; Agro-Processing</p><p class="ind-panel-intro">For factories, metal and wood workshops, food and beverage producers, and edible oil/flour mills.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Formula &amp; Recipe Control (BOM): </span><span class="feat-desc">Define multi-level Bills of Materials to track the exact quantity of raw ingredients or parts needed for each batch.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Production Floor Tracking: </span><span class="feat-desc">Monitor work orders at each station, measure machine runtimes, and track labor hours to determine accurate unit production costs.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Scrap &amp; Waste Auditing: </span><span class="feat-desc">Log raw material waste and scrap during manufacturing runs to identify production bottlenecks and stop inventory leakage.</span></div></div></div><div class="ind-panel" id="ind-2"><p class="ind-panel-title">8.3. Construction, Engineering &amp; Contracting</p><p class="ind-panel-intro">For general contractors, electro-mechanical firms, and specialized project service providers.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Project Milestone Tracking: </span><span class="feat-desc">Track project phases visually using Kanban boards and Gantt charts, ensuring site deliverables stay on schedule.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Site Material Usage: </span><span class="feat-desc">Assign warehouse withdrawals and equipment usage directly to specific construction sites or project codes.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Progress Invoicing: </span><span class="feat-desc">Bill clients automatically based on completed contract milestones, verified engineer timesheets, or percentage-of-completion agreements.</span></div></div></div><div class="ind-panel" id="ind-3"><p class="ind-panel-title">8.4. Retail Chains, Supermarkets &amp; Showrooms</p><p class="ind-panel-intro">For electronics stores, fashion boutiques, supermarkets, and construction supply outlets.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Fast Point of Sale (POS): </span><span class="feat-desc">Ring up sales quickly using barcode scanners, receipt printers, and touchscreen interfaces.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Local Payment Support: </span><span class="feat-desc">Accept cash, Telebirr, CBE Birr, and card payments directly at the cash register.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Uninterrupted Offline Selling: </span><span class="feat-desc">Continue making sales and printing receipts during network interruptions; the system syncs all records automatically once connectivity returns.</span></div></div></div><div class="ind-panel" id="ind-4"><p class="ind-panel-title">8.5. Professional Services, Consulting &amp; NGOs</p><p class="ind-panel-intro">For audit firms, legal practices, consulting agencies, and non-profit organizations.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Budget &amp; Fund Accounting: </span><span class="feat-desc">Track grants, donor funds, and organizational expenditures against approved budget lines in real time.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Timesheet &amp; Billing Management: </span><span class="feat-desc">Track billable consultant hours and generate professional client invoices with one click.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Document &amp; Approval Control: </span><span class="feat-desc">Manage purchase approvals, vendor agreements, and internal payment vouchers digitally without paper trails.</span></div></div></div><div class="ind-panel" id="ind-5"><p class="ind-panel-title">8.6. Healthcare, Clinics &amp; Pharmaceuticals</p><p class="ind-panel-intro">For private hospitals, specialty clinics, pharmacies, and pharmaceutical importers.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Expiry &amp; Batch/Lot Control: </span><span class="feat-desc">Track medications and medical supplies by batch numbers and expiration dates with automatic alerts before items expire.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Direct POS Integration for Pharmacies: </span><span class="feat-desc">Issue compliant receipts and track shelf inventory instantly at retail medicine counters.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Strict Stock Traceability: </span><span class="feat-desc">Maintain an unbroken audit trail for regulated supplies from customs arrival to patient dispensing.</span></div></div></div></div></div><div style="border-top:6px solid #F0F0FA;"></div><div id="sec9" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span class="sec-pill">9</span><h2 class="sec-title">Implementation Approach &amp; Methodology</h2></div><hr class="sec-rule"><p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin-bottom:10px;">A Practical, Step-by-Step Path to Business Transformation.</p><div class="callout">Software alone will not transform a company; execution does.</div><p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:12px;">In Ethiopia, many software projects fail because external consultants apply rigid corporate templates that ignore local realities&mdash;such as manual store records, fluctuating internet connectivity, paper-based approval habits, and employee resistance to unfamiliar technology.</p><p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:18px;">Addis Tech uses a structured, phased implementation methodology built specifically for the Ethiopian business environment. We break every rollout into four straightforward phases to minimize business disruption, ensure full tax compliance, and guarantee your team adopts the system with confidence from day one.</p><p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin-bottom:8px;">Our 4-Phase Implementation Framework</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:18px;"><div style="background:#1B1464;color:#fff;border-radius:8px;padding:8px 6px;font-size:.7rem;font-weight:600;line-height:1.35;text-align:center;">Phase 1:<br>Discovery &amp; Blueprint</div><div style="background:#1B1464;color:#fff;border-radius:8px;padding:8px 6px;font-size:.7rem;font-weight:600;line-height:1.35;text-align:center;">Phase 2:<br>Configuration &amp; Testing</div><div style="background:#1B1464;color:#fff;border-radius:8px;padding:8px 6px;font-size:.7rem;font-weight:600;line-height:1.35;text-align:center;">Phase 3:<br>Data Transfer &amp; Training</div><div style="background:#1B1464;color:#fff;border-radius:8px;padding:8px 6px;font-size:.7rem;font-weight:600;line-height:1.35;text-align:center;">Phase 4:<br>Go-Live &amp; On-Site Support</div></div><div class="phase-step"><div class="phase-num">1</div><div style="flex:1;min-width:0;"><p class="phase-title">Phase 1: Discovery &amp; Business Blueprint</p><p class="phase-subtitle">Understanding how your business runs before configuring software.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">On-Site Operational Walkthrough: </span><span class="feat-desc">Our business analysts visit your head office, shops, or warehouses in Addis Ababa and regional hubs to inspect daily routines.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Process Mapping: </span><span class="feat-desc">We document how items move from purchase orders to your shelves, how sales counters collect money, and how accountants file monthly VAT with the Ministry of Revenues (MOR).</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Clear Project Blueprint: </span><span class="feat-desc">We establish user roles, approval levels, and project milestones in plain language. Work begins only after leadership reviews and approves the blueprint.</span></div></div></div></div><div class="phase-step"><div class="phase-num">2</div><div style="flex:1;min-width:0;"><p class="phase-title">Phase 2: System Configuration &amp; Localization</p><p class="phase-subtitle">Tailoring the system to match your daily workflow and local tax rules.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Core Module Setup: </span><span class="feat-desc">We activate and tune your core applications (Accounting, Inventory, Sales, Purchase, HR, or Production) to mirror your exact operations.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Ethiopian Tax &amp; Compliance Setup: </span><span class="feat-desc">We configure VAT (15%), Withholding Tax rules, Ethiopian fiscal calendars, and connections to certified sales register machines or electronic invoicing tools.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Local Integrations: </span><span class="feat-desc">Our engineering team connects Odoo directly with local payment services like Telebirr, CBE Birr, or custom company databases.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Simulation &amp; Testing: </span><span class="feat-desc">We test everyday transactions&mdash;such as receiving an imported container, issuing a tax invoice, or running monthly payroll&mdash;inside a secure test system to ensure total accuracy before launch.</span></div></div></div></div><div class="phase-step"><div class="phase-num">3</div><div style="flex:1;min-width:0;"><p class="phase-title">Phase 3: Data Transfer &amp; Hands-On Staff Training</p><p class="phase-subtitle">Cleaning your business records and empowering your employees.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Data Cleansing: </span><span class="feat-desc">We assist your team in organizing and verifying opening balances, customer contacts, supplier records, and inventory lists from Peachtree, Excel sheets, or paper records.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Accurate Data Import: </span><span class="feat-desc">We load your clean records into Odoo and reconcile them against your current financial statements to guarantee zero data loss.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div style="min-width:0;"><span class="feat-title">Role-Based, In-Person Training:</span><div style="margin:6px 0 0 0;padding:8px 10px;background:#fff;border-radius:6px;border:1px solid #E0E0EE;"><div style="font-size:.78rem;color:#3A3A5A;line-height:1.5;margin-bottom:6px;">We do not deliver abstract lectures. We train your staff directly on their everyday tasks in Amharic and English:</div><div style="font-size:.78rem;color:#3A3A5A;line-height:1.5;margin-bottom:4px;"><strong style="color:#1B1464;">&bull; Sales &amp; Cashiers:</strong> Ringing up sales, issuing receipts on touchscreen POS, and accepting Telebirr or cash.</div><div style="font-size:.78rem;color:#3A3A5A;line-height:1.5;margin-bottom:4px;"><strong style="color:#1B1464;">&bull; Warehouse Staff:</strong> Scanning barcodes, receiving supplier shipments, issuing delivery slips, and taking stock counts.</div><div style="font-size:.78rem;color:#3A3A5A;line-height:1.5;margin-bottom:4px;"><strong style="color:#1B1464;">&bull; Accountants:</strong> Generating VAT reports, matching vendor bills, reconciling bank statements, and checking profit sheets.</div><div style="font-size:.78rem;color:#3A3A5A;line-height:1.5;"><strong style="color:#1B1464;">&bull; Executive Management:</strong> Tracking live operational dashboards, viewing financial reports, and approving purchase orders from mobile phones.</div></div></div></div></div></div><div class="phase-step"><div class="phase-num">4</div><div style="flex:1;min-width:0;"><p class="phase-title">Phase 4: Go-Live &amp; On-Site Support</p><p class="phase-subtitle">Ensuring a smooth, worry-free switchover with zero disruption to daily sales.</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Controlled Cutover: </span><span class="feat-desc">We schedule the final system switchover during low-activity windows (such as weekends or month-end closings) to protect customer service.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">On-Site Floor Support: </span><span class="feat-desc">During the critical first two weeks of launch, Addis Tech engineers remain physically on-site at your offices to guide staff, resolve questions, and eliminate bottlenecks immediately.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Ongoing Support &amp; Maintenance: </span><span class="feat-desc">Once daily operations run smoothly, we transition your business into our local support service for regular system backups, performance updates, and ongoing technical assistance.</span></div></div></div></div><p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin:20px 0 4px;">Our Implementation Guarantees</p><div class="tbl-wrap"><table><thead><tr><th style="width:34%;">Key Factor</th><th>What It Means for Your Business</th></tr></thead><tbody><tr><td><strong>Phased Deployment</strong></td><td>Start with foundational modules (Accounting, Inventory, Sales) first. Once your staff is comfortable, we activate advanced tools like Manufacturing or CRM without disrupting operations.</td></tr><tr><td><strong>Zero Data Loss</strong></td><td>Opening cash balances, customer debts, supplier payables, and physical stock counts are audited line-by-line before your old tools are retired.</td></tr><tr><td><strong>Local Accountability</strong></td><td>You work directly with software engineers and consultants based in Addis Ababa who provide immediate, in-person assistance.</td></tr></tbody></table></div></div><div style="border-top:6px solid #F0F0FA;"></div><div id="sec10" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span class="sec-pill">10</span><h2 class="sec-title">Project Team &amp; Governance Structure</h2></div><hr class="sec-rule"><p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:12px;">Depending on the project scale, complexity, and specific business requirements, Addis Tech deploys a dedicated, cross-functional team of seasoned domain specialists and software engineers. Our implementation approach bridges high-level business strategy with deep technical execution, combining direct functional expertise in Finance, Sales, and Supply Chain with hands-on technical mastery in Odoo ERP architecture and infrastructure setup.</p><div class="callout"><strong style="font-style:normal;">Note on Team Allocation:</strong> The team members highlighted below represent our senior project leads and dedicated subject-matter experts assigned to oversee governance, strategy, and core delivery. Based on project scope and operational needs, each engagement is supported by an extended team comprising additional senior and junior functional consultants, software developers, QA engineers, data migration specialists, and on-site support staff to ensure comprehensive coverage across all project phases.</div><p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin:16px 0 10px;">Key Senior Leadership &amp; Project Leads</p><div class="team-card" style="margin-bottom:10px;"><div class="team-avatar">EA</div><div style="flex:1;min-width:0;"><p class="team-name">1. Eyob Atnafu</p><p class="team-role">Project Manager</p><span class="team-exp">Experience: 10+ Years</span><p class="team-expertise-label">Core Expertise:</p><p class="team-expertise">Software Project Management | ERP Implementation | Software Development Lifecycle</p><p class="team-impact-label">Role &amp; Impact:</p><p class="team-impact">Leads overall project execution, timeline management, resource allocation, and risk mitigation. Ensures seamless coordination between client stakeholders and technical teams, maintaining strict adherence to deliverables, budget, and quality standards.</p></div></div><div class="team-card" style="margin-bottom:10px;"><div class="team-avatar">MA</div><div style="flex:1;min-width:0;"><p class="team-name">2. Mesay Alemayehu</p><p class="team-role">Lead Business (Functional) Consultant</p><span class="team-exp">Experience: 12+ Years</span><p class="team-expertise-label">Core Expertise:</p><p class="team-expertise">Business Process Reengineering (BPR) | Process Design | Change Management | Sales &amp; Supply Chain Optimization</p><p class="team-impact-label">Role &amp; Impact:</p><p class="team-impact">Audits existing client workflows to design optimized target processes. Leads functional blueprinting, change management, and end-user adoption, aligning supply chain, sales, and administrative operations with international ERP best practices.</p></div></div><div class="team-card" style="margin-bottom:10px;"><div class="team-avatar">YT</div><div style="flex:1;min-width:0;"><p class="team-name">3. Yohanis Taye</p><p class="team-role">Lead Odoo Developer</p><span class="team-exp">Experience: 8+ Years</span><p class="team-expertise-label">Core Expertise:</p><p class="team-expertise">Odoo Core Architecture | Custom Module Development | System Integration | Backend Engineering</p><p class="team-impact-label">Role &amp; Impact:</p><p class="team-impact">Spearheads technical customization, module configuration, and API integrations. Ensures system performance, clean code architecture, and tailored workflow logic designed specifically for complex operational demands.</p></div></div><div class="team-card" style="margin-bottom:10px;"><div class="team-avatar">GM</div><div style="flex:1;min-width:0;"><p class="team-name">4. Gashaw Mekonen</p><p class="team-role">Accounting &amp; Finance Expert</p><span class="team-exp">Experience: 13+ Years, Certified Accountant &amp; Auditor</span><p class="team-expertise-label">Core Expertise:</p><p class="team-expertise">Financial Advisory | Tax Compliance &amp; Reporting | Statutory Auditing | Cost Accounting</p><p class="team-impact-label">Role &amp; Impact:</p><p class="team-impact">Oversees financial localization, Chart of Accounts configuration, and tax rule setup (VAT, Withholding, MOR compliance). Ensures automated reconciliation, ledger accuracy, and complete audit readiness across financial workflows.</p></div></div><div class="team-card" style="margin-bottom:10px;"><div class="team-avatar">BT</div><div style="flex:1;min-width:0;"><p class="team-name">5. Belay Tadios</p><p class="team-role">Senior DevOps Engineer</p><span class="team-exp">Experience: 6+ Years</span><p class="team-expertise-label">Core Expertise:</p><p class="team-expertise">ERP Infrastructure &amp; Deployment | System Environment Setup | Database Security &amp; Optimization</p><p class="team-impact-label">Role &amp; Impact:</p><p class="team-impact">Architect of cloud and on-premise server environments. Responsible for system security, automated backups, high-availability architecture, network stability, and offline-online database synchronization.</p></div></div><p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin:20px 0 6px;">Extended Implementation &amp; Support Squad</p><p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:8px;">To ensure complete hands-on execution and seamless on-site support, each implementation team is scaled dynamically:</p><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Senior &amp; Junior Functional Consultants: </span><span class="feat-desc">Conduct module-specific user training (in Amharic and English), handle day-to-day workflow configurations, and assist departments during initial go-live operations.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Software &amp; Integration Developers: </span><span class="feat-desc">Assist with custom report building, data extraction scripts, interface tuning, and local payment gateway/hardware integrations.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">Data Migration &amp; Quality Analysts: </span><span class="feat-desc">Focus on cleansing, auditing, and loading historical records (opening balances, contacts, inventory counts) to guarantee zero data loss.</span></div></div><div class="feat-item"><span class="feat-dot">●</span><div><span class="feat-title">On-Site Floor Support Technicians: </span><span class="feat-desc">Stationed directly at client headquarters, retail stores, or warehouse depots during launch windows to guide end-users and resolve issues instantly.</span></div></div></div><div style="border-top:6px solid #F0F0FA;"></div><div id="sec11" class="doc-section" style="padding:24px 16px;max-width:680px;margin:0 auto;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span class="sec-pill">11</span><h2 class="sec-title">Next Steps &amp; Project Initiation</h2></div><hr class="sec-rule"><p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:12px;">Partnering with <strong>Addis Tech PLC</strong> ensures your organization transitions smoothly from fragmented, manual workflows to a unified, automated, and fully compliant Odoo ERP ecosystem. We are prepared to bring our deep industry expertise, hands-on functional engineering, and local tax compliance solutions to empower your business growth.</p><p style="font-size:.84rem;color:#2C2C3E;line-height:1.65;margin-bottom:14px;">To move forward and initiate your ERP transformation journey, we recommend the following four simple steps:</p><p style="font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:#1B1464;margin-bottom:10px;">Recommended Roadmap to Engagement</p><div class="next-step"><div class="next-step-header"><div class="next-step-num">1</div><p class="next-step-title">Step 1: Schedule an Executive Alignment &amp; Live Demo</p></div><p class="action-label">Action:</p><p class="action-text">Contact our consulting team to schedule an interactive, tailored Odoo ERP demonstration focused on your specific industry workflows (Finance, Supply Chain, Retail POS, or Manufacturing).</p><p class="outcome-label">Outcome:</p><p class="outcome-text" style="margin-bottom:0;">Experience how Odoo handles your everyday operational scenarios and local tax requirements in real time.</p></div><div class="next-step"><div class="next-step-header"><div class="next-step-num">2</div><p class="next-step-title">Step 2: Comprehensive On-Site Business Assessment (Blueprint)</p></div><p class="action-label">Action:</p><p class="action-text">Our lead functional consultants and business analysts conduct a 1-to-2 day walkthrough of your office, store, or warehouse locations.</p><p class="outcome-label">Outcome:</p><p class="outcome-text" style="margin-bottom:0;">We map your existing processes, define custom module requirements, and produce a formal <strong>Business Requirements &amp; Scope Alignment Document</strong>.</p></div><div class="next-step"><div class="next-step-header"><div class="next-step-num">3</div><p class="next-step-title">Step 3: Final Scope Approval &amp; Agreement Sign-Off</p></div><p class="action-label">Action:</p><p class="action-text">Review and sign the finalized Implementation Statement of Work (SOW), project milestones, timeline schedule, and warranty/support agreement.</p><p class="outcome-label">Outcome:</p><p class="outcome-text" style="margin-bottom:0;">Formal project authorization and reservation of dedicated senior technical resources.</p></div><div class="next-step"><div class="next-step-header"><div class="next-step-num">4</div><p class="next-step-title">Step 4: Project Mobilization &amp; Phase 1 Discovery Kickoff</p></div><p class="action-label">Action:</p><p class="action-text">Official project launch meeting between your executive sponsors, project leads, and the Addis Tech implementation squad.</p><p class="outcome-label">Outcome:</p><p class="outcome-text" style="margin-bottom:0;">Immediate commencement of system setup, data preparation, and workflow configuration.</p></div><div id="contact" style="background:linear-gradient(160deg,#1B1464 0%,#0B0642 100%);border-radius:12px;padding:18px 14px;margin-top:20px;"><p style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:6px;">&#128222; Contact Us to Get Started Today</p><p style="font-size:.8rem;color:rgba(240,240,255,.85);line-height:1.55;margin-bottom:14px;">Take the first step toward operational excellence and real-time financial control. Reach out to our team to arrange your initial consultation:</p><div class="contact-item"><span class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span><span style="display:block;font-size:.66rem;font-weight:700;color:#FFA600;text-transform:uppercase;letter-spacing:.05em;">Office Address</span>Addis Tech PLC, Addis Ababa, Ethiopia</span></div><div class="contact-item"><span class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span><span><span style="display:block;font-size:.66rem;font-weight:700;color:#FFA600;text-transform:uppercase;letter-spacing:.05em;">Email</span><a href="mailto:info@addistechplc.com" style="color:#fff;">info@addistechplc.com</a> / <a href="mailto:sales@addistechplc.com" style="color:#fff;">sales@addistechplc.com</a></span></div><div class="contact-item"><span class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></span><span><span style="display:block;font-size:.66rem;font-weight:700;color:#FFA600;text-transform:uppercase;letter-spacing:.05em;">WhatsApp (Primary Contact)</span><a href="https://wa.me/251911202265" target="_blank" rel="noopener" style="color:#fff;font-weight:700;">+251 91120 2265</a></span></div><div class="contact-item"><span class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 4.11a2 2 0 0 1 2-2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span><span style="display:block;font-size:.66rem;font-weight:700;color:#FFA600;text-transform:uppercase;letter-spacing:.05em;">Phone</span><a href="tel:+251911505992" style="color:#fff;font-weight:700;">+251 911 505992</a></span></div><div class="contact-item"><span class="contact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></span><span><span style="display:block;font-size:.66rem;font-weight:700;color:#FFA600;text-transform:uppercase;letter-spacing:.05em;">Website</span><a href="https://www.addistechplc.com" target="_blank" rel="noopener" style="color:#fff;">www.addistechplc.com</a></span></div></div></div>
+<div style="height:12px;"></div>
+
+<script>
+(function(){
+  var header=document.getElementById('sticky-header');
+  var dock=document.getElementById('bottom-dock');
+  var bar=document.getElementById('progress-bar');
+  var backTop=document.getElementById('back-top');
+  var chips=[].slice.call(document.querySelectorAll('.toc-chip'));
+  var sections=chips.map(function(c){return document.querySelector(c.getAttribute('href'));});
+  var lastY=window.pageYOffset, ticking=false;
+
+  function update(){
+    var y=window.pageYOffset;
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?(y/h*100):0)+'%';
+    // Hide header + dock after scrolling starts; reveal on scroll-up or at top
+    if(y>60 && y>lastY+4){ header.classList.add('hidden-up'); dock.classList.add('hidden-down'); }
+    else if(y<lastY-8 || y<=60){ header.classList.remove('hidden-up'); dock.classList.remove('hidden-down'); }
+    backTop.classList.toggle('show', y>600);
+    // Active TOC chip
+    var idx=-1;
+    for(var i=0;i<sections.length;i++){ if(sections[i] && sections[i].getBoundingClientRect().top<=140) idx=i; }
+    chips.forEach(function(c,i){ c.classList.toggle('active', i===idx); });
+    if(idx>=0){ var a=chips[idx], nav=document.getElementById('toc-nav');
+      nav.scrollLeft=a.offsetLeft-nav.clientWidth/2+a.clientWidth/2; }
+    lastY=y; ticking=false;
+  }
+  window.addEventListener('scroll',function(){ if(!ticking){ticking=true;requestAnimationFrame(update);} },{passive:true});
+  update();
+
+  // Smooth anchor offset for fixed header
+  chips.forEach(function(c){
+    c.addEventListener('click',function(e){
+      e.preventDefault();
+      var t=document.querySelector(c.getAttribute('href'));
+      if(t) window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-12,behavior:'smooth'});
+    });
+  });
+})();
+
+// Accordion (one open at a time)
+function toggleAcc(id){
+  var item=document.getElementById(id), wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(function(i){i.classList.remove('open');});
+  if(!wasOpen){ item.classList.add('open');
+    setTimeout(function(){ var r=item.getBoundingClientRect(); if(r.top<80) window.scrollTo({top:r.top+window.pageYOffset-80,behavior:'smooth'}); },60); }
+}
+
+// Industry tabs
+function showInd(n){
+  document.querySelectorAll('.ind-tab').forEach(function(t,i){t.classList.toggle('active',i===n);});
+  document.querySelectorAll('.ind-panel').forEach(function(p,i){p.classList.toggle('active',i===n);});
+}
+</script>
+
+</body>
+</html>

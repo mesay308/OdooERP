@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Odoo ERP Visual Overview &amp; Implementation Guide | Addis Tech PLC</title>
+<meta name="description" content="Visual-oriented overview of Odoo ERP and Addis Tech PLC implementation methodology for Ethiopian businesses.">
+<meta name="theme-color" content="#1B1464">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:#F4F5FA;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:#1A1A2E;background:#F4F5FA;overflow-x:hidden;padding-top:98px;padding-bottom:66px;}
+
+/* ── Reading Progress Bar ── */
+#progress-bar{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#FFA600,#714B67,#017E84,#06A225);z-index:9999;transition:width .1s linear;pointer-events:none;}
+
+/* ── Sticky Header ── */
+#sticky-header{position:fixed;top:3px;left:0;right:0;z-index:1000;background:#1B1464;border-bottom:1px solid rgba(255,255,255,.12);transition:transform .3s ease,opacity .25s ease,background-color .3s ease;transform:translateY(0);}
+#sticky-header.odoo-mode{background:#53354B;}
+#sticky-header.hidden-up{transform:translateY(-110%);opacity:0;pointer-events:none;}
+
+/* ── Section Chip Nav ── */
+#toc-nav{background:#120D45;border-bottom:1px solid rgba(255,255,255,.1);overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch;transition:background-color .3s ease;}
+#sticky-header.odoo-mode #toc-nav{background:#3E2638;}
+#toc-nav::-webkit-scrollbar{display:none;}
+.toc-chip{display:inline-flex;align-items:center;padding:5px 11px;margin:5px 3px;border-radius:9999px;font-size:.69rem;font-weight:600;color:rgba(240,240,255,.85);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);text-decoration:none;transition:all .2s;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.toc-chip.odoo-chip{border-color:rgba(1,126,132,.55);background:rgba(113,75,103,.32);}
+.toc-chip.active,.toc-chip:hover{background:#FFA600;color:#000C1D;border-color:#FFA600;font-weight:700;}
+.toc-chip.odoo-chip.active{background:#00A09D;color:#fff;border-color:#00A09D;}
+
+/* ── Section Container & Headers ── */
+.v-sec{max-width:680px;margin:0 auto;padding:22px 12px;background:#fff;}
+.v-divider{height:8px;background:#ECEEF8;max-width:680px;margin:0 auto;}
+.sec-head{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.sec-pill{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:8px;background:#1B1464;color:#FFA600;font-size:.72rem;font-weight:800;font-family:'Outfit',sans-serif;flex-shrink:0;}
+.sec-title{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:800;color:#1B1464;line-height:1.25;}
+.sec-sub{font-size:.78rem;color:#003B95;font-weight:600;margin-bottom:12px;}
+.sec-rule{border:none;border-top:1.5px solid #E6E8F4;margin:8px 0 14px 0;}
+
+/* ── Odoo Brand Zone (Sections 4, 5, 6) ── */
+.odoo-zone-wrap{background:linear-gradient(180deg,#F9F5F8 0%,#F3F9F9 100%);border-top:3px solid #714B67;border-bottom:3px solid #017E84;}
+.odoo-sec{max-width:680px;margin:0 auto;padding:22px 12px;background:transparent;}
+.odoo-divider{height:8px;background:linear-gradient(90deg,rgba(113,75,103,.12),rgba(1,126,132,.12));max-width:680px;margin:0 auto;}
+.odoo-pill{background:#714B67;color:#fff;}
+.odoo-title{color:#53354B;}
+.odoo-sub{color:#017E84;}
+.odoo-rule{border-top-color:#E5D8E2;}
+.odoo-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#714B67,#017E84);color:#fff;font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:4px 10px;border-radius:999px;margin-bottom:8px;}
+
+/* ── Visual Cards & Grids ── */
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.v-card{background:#F8F9FE;border:1px solid #E2E5F3;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:5px;}
+.v-card-row{background:#F8F9FE;border:1px solid #E2E5F3;border-radius:10px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;}
+.v-icon{width:32px;height:32px;border-radius:8px;background:#1B1464;color:#FFA600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.v-icon-blue{background:#E5F0FC;color:#003B95;}
+.v-icon-green{background:#E6F7EA;color:#06A225;}
+.v-icon-plum{background:#714B67;color:#fff;}
+.v-icon-teal{background:#017E84;color:#fff;}
+.v-card-title{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;color:#1B1464;line-height:1.25;}
+.v-card-desc{font-size:.74rem;color:#444462;line-height:1.4;}
+
+/* ── Stat / Counter Strip ── */
+.stat-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0;}
+.stat-box{background:linear-gradient(145deg,#1B1464,#0B0642);color:#fff;border-radius:10px;padding:10px 6px;text-align:center;border:1px solid rgba(255,255,255,.1);}
+.stat-num{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:#FFA600;line-height:1.1;}
+.stat-lbl{font-size:.63rem;color:rgba(240,240,255,.85);margin-top:3px;line-height:1.2;}
+.odoo-stat-box{background:linear-gradient(145deg,#714B67,#4E3247);}
+.odoo-stat-teal{background:linear-gradient(145deg,#017E84,#015B60);}
+
+/* ── Accordion (Section 6 Odoo Modules) ── */
+.mod-acc{background:#fff;border:1px solid #DFCEDA;border-left:4px solid #714B67;border-radius:10px;margin-bottom:8px;overflow:hidden;transition:box-shadow .2s;}
+.mod-acc.teal-left{border-left-color:#017E84;}
+.mod-acc.open{box-shadow:0 4px 14px rgba(113,75,103,.12);}
+.mod-trig{width:100%;display:flex;align-items:center;gap:9px;padding:11px 12px;background:none;border:none;text-align:left;cursor:pointer;}
+.mod-num{font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:800;padding:3px 7px;border-radius:6px;background:#714B67;color:#fff;flex-shrink:0;}
+.mod-acc.teal-left .mod-num{background:#017E84;}
+.mod-head-wrap{flex:1;min-width:0;}
+.mod-title{font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:700;color:#4E3247;line-height:1.2;}
+.mod-tag{font-size:.69rem;color:#017E84;font-weight:600;display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mod-chev{width:18px;height:18px;color:#714B67;transition:transform .25s;flex-shrink:0;}
+.mod-acc.open .mod-chev{transform:rotate(180deg);}
+.mod-body{display:none;padding:0 12px 12px 12px;border-top:1px dashed #EADCE6;}
+.mod-acc.open .mod-body{display:block;}
+.mod-feat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px;}
+.mod-feat-chip{background:#FAF6F9;border:1px solid #E9DAE5;border-radius:8px;padding:7px 8px;}
+.mod-acc.teal-left .mod-feat-chip{background:#F3FAFA;border-color:#D2ECEC;}
+.mod-feat-t{font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:700;color:#53354B;display:flex;align-items:center;gap:4px;margin-bottom:2px;}
+.mod-acc.teal-left .mod-feat-t{color:#015B60;}
+.mod-feat-d{font-size:.69rem;color:#4A4A68;line-height:1.35;}
+
+/* ── Filter Pills (Section 6 & Section 8) ── */
+.filter-bar{display:flex;gap:5px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-pill{padding:5px 11px;border-radius:999px;font-size:.7rem;font-weight:700;font-family:'Outfit',sans-serif;border:1px solid #D9C3D3;background:#fff;color:#53354B;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.filter-pill.active{background:#714B67;color:#fff;border-color:#714B67;}
+
+/* ── Industry Selector Tiles (Section 8) ── */
+.ind-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px;}
+.ind-tile{background:#F5F7FF;border:1.5px solid #DCE1F5;border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.ind-tile.active{background:#1B1464;border-color:#1B1464;color:#fff;box-shadow:0 3px 10px rgba(27,20,100,.22);}
+.ind-tile-num{font-size:.62rem;font-weight:800;color:#003B95;background:#E5F0FC;padding:1px 6px;border-radius:99px;}
+.ind-tile.active .ind-tile-num{background:#FFA600;color:#000C1D;}
+.ind-tile-name{font-family:'Outfit',sans-serif;font-size:.71rem;font-weight:700;line-height:1.2;color:#1B1464;}
+.ind-tile.active .ind-tile-name{color:#fff;}
+.ind-view{display:none;background:#F8F9FE;border:1.5px solid #1B1464;border-radius:10px;padding:12px;}
+.ind-view.active{display:block;}
+
+/* ── Bottom Dock & Back Top ── */
+#bottom-dock{position:fixed;bottom:0;left:0;right:0;z-index:1000;background:rgba(27,20,100,.96);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.12);padding:7px 10px;padding-bottom:max(7px,env(safe-area-inset-bottom));transition:transform .3s ease;}
+#bottom-dock.hidden-down{transform:translateY(110%);}
+.dock-inner{max-width:680px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr auto;gap:6px;align-items:center;}
+.dock-btn{display:flex;align-items:center;justify-content:center;gap:4px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:8px;padding:6px 6px;text-decoration:none;font-size:.68rem;font-weight:700;min-height:38px;white-space:nowrap;}
+.dock-cta{background:#FFA600;color:#000C1D;border:none;font-weight:800;font-size:.72rem;}
+.dock-doc{background:#fff;color:#1B1464;border:none;font-weight:800;}
+#back-top{position:fixed;bottom:68px;right:12px;z-index:900;display:none;width:36px;height:36px;border-radius:50%;background:#1B1464;color:#FFA600;border:1px solid rgba(255,255,255,.2);cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(27,20,100,.35);}
+#back-top.show{display:flex;}
+
+@media (max-width:360px){
+  .stat-strip{grid-template-columns:repeat(2,1fr);}
+  .mod-feat-grid{grid-template-columns:1fr;}
+}
+@media print{
+  #sticky-header,#bottom-dock,#back-top,#progress-bar{display:none!important;}
+  body{padding:0!important;}
+  .mod-body,.ind-view{display:block!important;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="progress-bar"></div>
+<div id="sticky-header">
+  <div style="max-width:680px;margin:0 auto;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
+    <div style="display:flex;align-items:center;gap:7px;">
+      <div style="background:rgba(255,255,255,.12);border-radius:6px;padding:4px;display:flex;">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M3.334 14.166L8.334 9.166L3.334 4.166" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/><path d="M10 15.834H16.6667" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/></svg>
+      </div>
+      <span style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:800;color:#fff;">Addis<span style="color:#FFA600;">Tech</span></span>
+      <span style="font-size:.6rem;background:rgba(255,166,0,.18);color:#FFA600;padding:2px 6px;border-radius:99px;font-weight:700;">Visual Guide</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;">
+      <a href="addis_tech_odoo_guide.html" style="display:inline-flex;align-items:center;gap:4px;background:#fff;color:#1B1464;font-family:'Outfit',sans-serif;font-weight:800;font-size:.68rem;padding:5px 9px;border-radius:9999px;text-decoration:none;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Main Document
+      </a>
+      <a href="https://wa.me/251911202265" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;font-weight:800;font-size:.68rem;padding:5px 10px;border-radius:9999px;text-decoration:none;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+  <div id="toc-nav">
+    <div style="max-width:680px;margin:0 auto;padding:0 6px;">
+      <a href="#sec1" class="toc-chip">1. Context</a>
+      <a href="#sec2" class="toc-chip">2. ERP Benefits</a>
+      <a href="#sec3" class="toc-chip">3. Why Addis Tech</a>
+      <a href="#sec4" class="toc-chip odoo-chip">4. Why Odoo ERP</a>
+      <a href="#sec5" class="toc-chip odoo-chip">5. Core Apps</a>
+      <a href="#sec6" class="toc-chip odoo-chip">6. 10 Modules</a>
+      <a href="#sec7" class="toc-chip">7. AI &amp; Custom</a>
+      <a href="#sec8" class="toc-chip">8. Industries</a>
+      <a href="#sec9" class="toc-chip">9. Methodology</a>
+      <a href="#sec10" class="toc-chip">10. Project Team</a>
+      <a href="#sec11" class="toc-chip">11. Next Steps</a>
+    </div>
+  </div>
+</div>
+
+<div id="top"></div>
+<div style="background:linear-gradient(155deg,#1B1464 0%,#0B0642 65%,#2D1846 100%);padding:22px 12px 20px 12px;">
+  <div style="max-width:680px;margin:0 auto;">
+    <!-- Top Brand & Mode Badge -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px;display:flex;">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M3.334 14.166L8.334 9.166L3.334 4.166" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/><path d="M10 15.834H16.6667" stroke="#FFA600" stroke-linecap="round" stroke-width="1.8"/></svg>
+        </div>
+        <span style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;">Addis<span style="color:#FFA600;">Tech</span> <span style="font-weight:500;font-size:.78rem;opacity:.75;">PLC</span></span>
+      </div>
+      <span style="font-size:.66rem;font-weight:700;color:#FFA600;background:rgba(255,166,0,.15);border:1px solid rgba(255,166,0,.35);padding:3px 9px;border-radius:99px;letter-spacing:.05em;text-transform:uppercase;">Visual Presentation &bull; 9/1/2026</span>
+    </div>
+
+    <h1 style="font-family:'Outfit',sans-serif;font-size:1.38rem;font-weight:800;color:#fff;line-height:1.22;margin-bottom:6px;">Odoo Enterprise Resource Planning (ERP) System Overview &amp; Implementation Guide</h1>
+    <p style="font-size:.78rem;color:rgba(240,240,255,.8);margin-bottom:14px;font-style:italic;">Business with World-Class Digital Solutions</p>
+
+    <!-- 3 Visual Value Pillars Infographic -->
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:16px;">
+      <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 7px;text-align:center;">
+        <div style="width:28px;height:28px;margin:0 auto 5px;border-radius:7px;background:rgba(255,166,0,.2);color:#FFA600;display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <p style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:700;color:#fff;line-height:1.25;">Manage Multiple Business Operations with One System</p>
+      </div>
+      <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 7px;text-align:center;">
+        <div style="width:28px;height:28px;margin:0 auto 5px;border-radius:7px;background:rgba(6,162,37,.25);color:#4ADE80;display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <p style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:700;color:#fff;line-height:1.25;">Automate your Business Operations with One System</p>
+      </div>
+      <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 7px;text-align:center;">
+        <div style="width:28px;height:28px;margin:0 auto 5px;border-radius:7px;background:rgba(1,126,132,.35);color:#5EEAD4;display:flex;align-items:center;justify-content:center;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <p style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:700;color:#fff;line-height:1.25;">Get Auto Generated Reports with Live Dashboards</p>
+      </div>
+    </div>
+
+    <!-- Hero Action Strip (Rule 6: Main Document Link Button + Primary WhatsApp) -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="https://wa.me/251911202265" target="_blank" rel="noopener" style="flex:1;min-width:170px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;font-weight:800;font-size:.8rem;padding:9px 14px;border-radius:9999px;text-decoration:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+        WhatsApp +251 91120 2265
+      </a>
+      <a href="addis_tech_odoo_guide.html" style="flex:1;min-width:165px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;color:#1B1464;font-family:'Outfit',sans-serif;font-weight:800;font-size:.8rem;padding:9px 14px;border-radius:9999px;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,.22);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1B1464" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Main Document (Full Guide)
+      </a>
+    </div>
+  </div>
+</div>
+
+<div id="sec1" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">1</span>
+    <h2 class="sec-title">Introduction &amp; Executive Context</h2>
+  </div>
+  <hr class="sec-rule">
+
+  <div style="background:#E5F0FC;border-left:3.5px solid #003B95;padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:12px;font-size:.78rem;color:#1A1A2E;line-height:1.45;font-weight:500;">
+    Navigating digital transformation requires localized ERP solutions that align directly with Ethiopian statutory tax laws, fiscal calendars, and commercial operating realities.
+  </div>
+
+  <!-- Visual Infographic: Fragmented Silos vs Unified ERP Solution -->
+  <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px;">
+    <!-- Before: Fragmented Departmental Silos -->
+    <div style="background:#FFF5F5;border:1px solid #FECACA;border-left:4px solid #DC2626;border-radius:10px;padding:10px 12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:800;color:#991B1B;text-transform:uppercase;letter-spacing:.04em;">&#9888; Isolated Departmental Silos &amp; Off-the-Shelf Limits</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px;">
+        <span style="font-size:.66rem;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:4px;font-weight:700;">Sales</span>
+        <span style="font-size:.66rem;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:4px;font-weight:700;">Procurement</span>
+        <span style="font-size:.66rem;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:4px;font-weight:700;">Inventory</span>
+        <span style="font-size:.66rem;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:4px;font-weight:700;">Manufacturing</span>
+        <span style="font-size:.66rem;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:4px;font-weight:700;">HR</span>
+        <span style="font-size:.66rem;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:4px;font-weight:700;">Financial Management</span>
+      </div>
+      <p style="font-size:.74rem;color:#7F1D1D;line-height:1.4;">Fragmented workflows and manual administration cause <strong>administrative bottlenecks, redundant data entry, routine errors, and inflated operating costs</strong>. Off-the-shelf global software fails without local Ethiopian tax and commercial customization.</p>
+    </div>
+
+    <!-- Down Arrow Infographic Connector -->
+    <div style="text-align:center;line-height:1;margin:-2px 0;">
+      <span style="display:inline-flex;align-items:center;gap:5px;background:#1B1464;color:#FFA600;font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:800;padding:3px 10px;border-radius:99px;">&#8595; THE ERP SOLUTION BY ADDIS TECH PLC &#8595;</span>
+    </div>
+
+    <!-- After: Unified ERP Platform -->
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-left:4px solid #06A225;border-radius:10px;padding:10px 12px;">
+      <p style="font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:#14532D;margin-bottom:4px;">&#10004; Unified Platform + End-to-End Ethiopian Transformation</p>
+      <p style="font-size:.74rem;color:#166534;line-height:1.42;margin-bottom:6px;">Consolidates company data into a single unified platform, automating routine tasks and enabling seamless cross-departmental information flow without manual intervention.</p>
+      <div style="background:#fff;border:1px solid #DCFCE7;border-radius:7px;padding:7px 9px;font-size:.73rem;color:#1A1A2E;line-height:1.38;">
+        <strong style="color:#1B1464;">Addis Tech PLC:</strong> Combines deep business consulting with dedicated software engineering to re-engineer core processes for the Ethiopian enterprise landscape.
+      </div>
+    </div>
+  </div>
+</div>
+<div class="v-divider"></div>
+
+<div id="sec2" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">2</span>
+    <h2 class="sec-title">Benefits of an ERP System</h2>
+  </div>
+  <p class="sec-sub">Core objectives achieved through unified ERP integration</p>
+
+  <div class="grid-2">
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <span class="v-card-title">Real-time Information &amp; Data</span>
+      </div>
+      <p class="v-card-desc">Systematically unifies business data and information flow across all departments.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon v-icon-blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+        <span class="v-card-title">Improved Collaboration</span>
+      </div>
+      <p class="v-card-desc">Cross-departmental data access eliminates communication silos so staff see the big picture.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon v-icon-green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <span class="v-card-title">Increased Productivity</span>
+      </div>
+      <p class="v-card-desc">Eliminates repetitive manual tasks so staff focus on core business growth.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <span class="v-card-title">Total Visibility</span>
+      </div>
+      <p class="v-card-desc">Complete visibility into key processes for staff and leadership via customized permissions.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon v-icon-blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <span class="v-card-title">Improved Reporting &amp; Planning</span>
+      </div>
+      <p class="v-card-desc">Unifies reporting across functions for seamless analysis without messy spreadsheets.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon v-icon-green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="v-card-title">Customer Service</span>
+      </div>
+      <p class="v-card-desc">Centralizes client information so sales teams focus on relationships instead of data entry.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <span class="v-card-title">Data Security &amp; Quality</span>
+      </div>
+      <p class="v-card-desc">Centralized data with granular role-based permissions and intrinsic security controls.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon v-icon-blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+        <span class="v-card-title">Collaboration &amp; Workflows</span>
+      </div>
+      <p class="v-card-desc">Funnels interdepartmental data into one central location for instant team access.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon v-icon-green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <span class="v-card-title">Standardized Processes</span>
+      </div>
+      <p class="v-card-desc">Adopts proven industry best practices to standardize operations and boost efficiency.</p>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <span class="v-card-title">Regulatory Compliance</span>
+      </div>
+      <p class="v-card-desc">Validated data and automated reporting tools simplify compliance and lower audit costs.</p>
+    </div>
+
+    <div class="v-card" style="grid-column:span 2;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="v-icon v-icon-blue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <span class="v-card-title">Superior Scalability</span>
+        <span style="font-size:.73rem;color:#444462;margin-left:4px;">— Elegantly and efficiently accommodates company growth as operations expand.</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="v-divider"></div>
+
+<div id="sec3" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">3</span>
+    <h2 class="sec-title">Why Choose Addis Tech?</h2>
+  </div>
+  <p class="sec-sub">Hands-on world-class functional consultants &amp; software engineering adapted for Ethiopia</p>
+
+  <!-- Stat Counter Infographic -->
+  <div class="stat-strip">
+    <div class="stat-box">
+      <div class="stat-num">7M+</div>
+      <div class="stat-lbl">Active Platform Users</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">100+</div>
+      <div class="stat-lbl">Integrated Modules</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">17+ Yrs</div>
+      <div class="stat-lbl">Global Refinement</div>
+    </div>
+    <div class="stat-box" style="background:linear-gradient(145deg,#06A225,#047A1B);">
+      <div class="stat-num" style="color:#fff;">1-Year</div>
+      <div class="stat-lbl" style="color:#E6F7EA;">Free Error Warranty</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Integrates All Key Functions</span>
+      <p class="v-card-desc">Connects all departments into one centralized database, eliminating bottlenecks and manual work.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Automated Real-Time Flow</span>
+      <p class="v-card-desc">Modules share data automatically without human intervention for real-time visibility.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Tailored to Ethiopia</span>
+      <p class="v-card-desc">Customized and reconfigured to align with Ethiopian operating rules and tax frameworks.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Modular Phased Rollout</span>
+      <p class="v-card-desc">Deploys highest-priority modules first to maximize immediate business value.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Future-Proof Scalability</span>
+      <p class="v-card-desc">Seamlessly integrate new modules or connect third-party apps as operations expand.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Affordable &amp; High-ROI</span>
+      <p class="v-card-desc">Feature-rich, world-class ERP software at cost-effective rates for accessible transformation.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Cloud &amp; Mobile Mobility</span>
+      <p class="v-card-desc">Local network or cloud-hosted environments accessible securely from any device anywhere.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Full or Partial Deployment</span>
+      <p class="v-card-desc">Step-by-step module rollouts for growing firms or full core suites for established enterprises.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">&#9679; Internationally Proven</span>
+      <p class="v-card-desc">Tested over 17+ years with 7M+ users, 100+ modules, supporting up to 10,000 simultaneous users.</p>
+    </div>
+    <div class="v-card" style="background:#F0FDF4;border-color:#BBF7D0;">
+      <span class="v-card-title" style="color:#06A225;">&#10004; 1-Year Service Guarantee</span>
+      <p class="v-card-desc" style="color:#166534;">100% confidence in reliability with a complimentary 1-year warranty to fix system errors free of charge.</p>
+    </div>
+  </div>
+</div>
+
+<div class="odoo-zone-wrap">
+  <div id="sec4" class="odoo-sec">
+    <div class="odoo-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+      Odoo ERP Official Ecosystem &bull; Sections 4 – 6
+    </div>
+    <div class="sec-head">
+      <span class="sec-pill odoo-pill">4</span>
+      <h2 class="sec-title odoo-title">Why Odoo ERP?</h2>
+    </div>
+    <p class="sec-sub odoo-sub">The Smart, Reliable, and Future-Proof Choice for Ethiopian Businesses</p>
+
+    <!-- 3-Way Comparison Visual Infographic -->
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px;">
+      <div style="background:#FFF5F5;border:1px solid #FECACA;border-top:3px solid #DC2626;border-radius:10px;padding:10px;">
+        <div style="font-size:.65rem;font-weight:800;color:#DC2626;text-transform:uppercase;margin-bottom:2px;">&#10006; Bad Option 1</div>
+        <p style="font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:#7F1D1D;margin-bottom:4px;">Basic, Disconnected Systems <span style="font-weight:500;font-size:.7rem;">(Peachtree, Excel)</span></p>
+        <p style="font-size:.72rem;color:#991B1B;line-height:1.38;">Cannot talk to warehouse, store, or purchasing. Staff enter numbers twice—causing missing stock, tax mistakes, and lost money.</p>
+      </div>
+
+      <div style="background:#FFF5F5;border:1px solid #FECACA;border-top:3px solid #DC2626;border-radius:10px;padding:10px;">
+        <div style="font-size:.65rem;font-weight:800;color:#DC2626;text-transform:uppercase;margin-bottom:2px;">&#10006; Bad Option 2</div>
+        <p style="font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:800;color:#7F1D1D;margin-bottom:4px;">Big Legacy Software <span style="font-weight:500;font-size:.7rem;">(SAP, Oracle)</span></p>
+        <p style="font-size:.72rem;color:#991B1B;line-height:1.38;">Built for massive global conglomerates, demand huge scarce foreign currency upfront, take 1+ year to set up, and are too complicated.</p>
+      </div>
+    </div>
+
+    <!-- Winner Banner: Odoo ERP -->
+    <div style="background:linear-gradient(135deg,#714B67 0%,#4E3247 55%,#017E84 100%);color:#fff;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 4px 12px rgba(113,75,103,.2);">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+        <span style="background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:99px;text-transform:uppercase;">&#10004; The Best of Both Worlds</span>
+      </div>
+      <p style="font-size:.78rem;line-height:1.45;color:rgba(255,255,255,.95);"><strong>Odoo ERP</strong> brings your entire company—<strong>sales, warehouse, accounting, purchasing, and staff records</strong>—into one unified, easy-to-use system accessible from your computer or mobile phone.</p>
+    </div>
+
+    <!-- Odoo Global Scale Infographic Counter Strip -->
+    <div class="stat-strip">
+      <div class="stat-box odoo-stat-box">
+        <div class="stat-num">28M+</div>
+        <div class="stat-lbl">Global Active Users</div>
+      </div>
+      <div class="stat-box odoo-stat-teal">
+        <div class="stat-num">200K+</div>
+        <div class="stat-lbl">Organizations</div>
+      </div>
+      <div class="stat-box odoo-stat-box">
+        <div class="stat-num">100K</div>
+        <div class="stat-lbl">Simultaneous Users</div>
+      </div>
+      <div class="stat-box odoo-stat-teal">
+        <div class="stat-num">50K+</div>
+        <div class="stat-lbl">Training Videos</div>
+      </div>
+    </div>
+
+    <p style="font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:800;color:#53354B;margin:10px 0 8px;">7 Key Advantages of Odoo ERP</p>
+    <div class="grid-2">
+      <div class="v-card" style="background:#fff;border-color:#DFCEDA;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="v-icon v-icon-plum"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 14l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+          <span class="v-card-title" style="color:#53354B;">Ethiopian Taxes &amp; E-Invoicing</span>
+        </div>
+        <p class="v-card-desc">Replaces Peachtree with MOR tax rules (VAT, Withholding), fiscal printers, and upcoming e-invoicing standards.</p>
+      </div>
+
+      <div class="v-card" style="background:#fff;border-color:#D2ECEC;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="v-icon v-icon-teal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <span class="v-card-title" style="color:#015B60;">Native Amharic &amp; Fiscal Calendar</span>
+        </div>
+        <p class="v-card-desc">Supports Amharic natively and configures directly to Ethiopian business tax years and reporting periods.</p>
+      </div>
+
+      <div class="v-card" style="background:#fff;border-color:#DFCEDA;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="v-icon v-icon-plum"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <span class="v-card-title" style="color:#53354B;">World-Class Trust &amp; Scale</span>
+        </div>
+        <p class="v-card-desc">Trusted by 28M+ users across 200,000+ organizations; supports 100,000 concurrent users with 50,000+ training videos.</p>
+      </div>
+
+      <div class="v-card" style="background:#fff;border-color:#D2ECEC;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="v-icon v-icon-teal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+          <span class="v-card-title" style="color:#015B60;">Easy on Any Device &amp; Phone</span>
+        </div>
+        <p class="v-card-desc">Designed like a modern smartphone app so managers track approvals, sales, and inventory anytime.</p>
+      </div>
+
+      <div class="v-card" style="background:#fff;border-color:#DFCEDA;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="v-icon v-icon-plum"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <span class="v-card-title" style="color:#53354B;">2FA Security &amp; Auto Backup</span>
+        </div>
+        <p class="v-card-desc">Protects financial and customer data using two-factor authentication (2FA), granular access controls, and auto backups.</p>
+      </div>
+
+      <div class="v-card" style="background:#fff;border-color:#D2ECEC;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="v-icon v-icon-teal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+          <span class="v-card-title" style="color:#015B60;">Customization &amp; Telebirr APIs</span>
+        </div>
+        <p class="v-card-desc">Tailored to your exact business rules and connects smoothly with external software and Telebirr via APIs.</p>
+      </div>
+
+      <div class="v-card" style="grid-column:span 2;background:#fff;border-color:#DFCEDA;">
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="v-icon v-icon-plum"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
+          <span class="v-card-title" style="color:#53354B;">Continuous Yearly Upgrades</span>
+          <span style="font-size:.73rem;color:#444462;">— Major yearly updates introduce new features, faster speeds, and enhanced security.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="odoo-divider"></div>
+
+  <div id="sec5" class="odoo-sec">
+    <div class="sec-head">
+      <span class="sec-pill odoo-pill" style="background:#017E84;">5</span>
+      <h2 class="sec-title odoo-title">Core Odoo ERP Applications</h2>
+    </div>
+    <p class="sec-sub odoo-sub">All Your Business Tools Working as One Connected Platform</p>
+
+    <!-- Silos Eliminated Strip -->
+    <div style="background:#fff;border:1px solid #E5D8E2;border-radius:10px;padding:9px 10px;margin-bottom:12px;">
+      <div style="font-size:.68rem;font-weight:800;color:#991B1B;text-transform:uppercase;margin-bottom:5px;">Replaces Disconnected Departmental Silos:</div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;font-size:.71rem;color:#7F1D1D;">
+        <div style="background:#FEF2F2;padding:4px 7px;border-radius:6px;">&#10006; Sales paper slips</div>
+        <div style="background:#FEF2F2;padding:4px 7px;border-radius:6px;">&#10006; Warehouse private notebooks</div>
+        <div style="background:#FEF2F2;padding:4px 7px;border-radius:6px;">&#10006; Retyping into Peachtree</div>
+        <div style="background:#FEF2F2;padding:4px 7px;border-radius:6px;">&#10006; Scattered project spreadsheets</div>
+      </div>
+    </div>
+
+    <!-- SVG Hub-and-Spoke Architecture Infographic -->
+    <div style="background:#fff;border:1.5px solid #714B67;border-radius:12px;padding:12px 10px;margin-bottom:12px;">
+      <p style="text-align:center;font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:800;color:#714B67;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">3 Operational Categories &bull; 10 Core Modules</p>
+      <svg viewBox="0 0 600 175" style="width:100%;height:auto;display:block;" aria-label="Odoo 3 Operational Categories Diagram">
+        <!-- Connector lines -->
+        <line x1="300" y1="36" x2="105" y2="92" stroke="#714B67" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <line x1="300" y1="36" x2="300" y2="92" stroke="#017E84" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <line x1="300" y1="36" x2="495" y2="92" stroke="#714B67" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <!-- Top Hub -->
+        <rect x="195" y="4" width="210" height="34" rx="17" fill="#714B67"/>
+        <text x="300" y="25" text-anchor="middle" fill="#fff" font-family="Outfit,sans-serif" font-size="13" font-weight="800">ODOO ERP LIVE LEDGER</text>
+        <!-- Pillar 1 -->
+        <rect x="8" y="88" width="188" height="82" rx="10" fill="#FAF5F9" stroke="#714B67" stroke-width="2"/>
+        <rect x="8" y="88" width="188" height="24" rx="8" fill="#714B67"/>
+        <text x="102" y="104" text-anchor="middle" fill="#fff" font-family="Outfit,sans-serif" font-size="11" font-weight="800">1. FINANCE &amp; CONTROL</text>
+        <text x="102" y="126" text-anchor="middle" fill="#4E3247" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="600">&bull; Accounting &amp; Invoicing</text>
+        <text x="102" y="142" text-anchor="middle" fill="#4E3247" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="600">&bull; Budget Management</text>
+        <text x="102" y="158" text-anchor="middle" fill="#4E3247" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="600">&bull; HR &amp; Payroll</text>
+        <!-- Pillar 2 -->
+        <rect x="206" y="88" width="188" height="82" rx="10" fill="#F2FAFA" stroke="#017E84" stroke-width="2"/>
+        <rect x="206" y="88" width="188" height="24" rx="8" fill="#017E84"/>
+        <text x="300" y="104" text-anchor="middle" fill="#fff" font-family="Outfit,sans-serif" font-size="11" font-weight="800">2. OPERATIONS &amp; SUPPLY</text>
+        <text x="300" y="123" text-anchor="middle" fill="#015B60" font-family="Plus Jakarta Sans,sans-serif" font-size="9.5" font-weight="600">&bull; Inventory &amp; Warehouses</text>
+        <text x="300" y="136" text-anchor="middle" fill="#015B60" font-family="Plus Jakarta Sans,sans-serif" font-size="9.5" font-weight="600">&bull; Purchasing &amp; Vendors</text>
+        <text x="300" y="149" text-anchor="middle" fill="#015B60" font-family="Plus Jakarta Sans,sans-serif" font-size="9.5" font-weight="600">&bull; Manufacturing (MRP)</text>
+        <text x="300" y="162" text-anchor="middle" fill="#015B60" font-family="Plus Jakarta Sans,sans-serif" font-size="9.5" font-weight="600">&bull; Project Management</text>
+        <!-- Pillar 3 -->
+        <rect x="404" y="88" width="188" height="82" rx="10" fill="#FAF5F9" stroke="#53354B" stroke-width="2"/>
+        <rect x="404" y="88" width="188" height="24" rx="8" fill="#53354B"/>
+        <text x="498" y="104" text-anchor="middle" fill="#FFA600" font-family="Outfit,sans-serif" font-size="11" font-weight="800">3. SALES &amp; GROWTH</text>
+        <text x="498" y="126" text-anchor="middle" fill="#4E3247" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="600">&bull; Sales &amp; Point of Sale (POS)</text>
+        <text x="498" y="142" text-anchor="middle" fill="#4E3247" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="600">&bull; Customer Management (CRM)</text>
+        <text x="498" y="158" text-anchor="middle" fill="#4E3247" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="600">&bull; Website &amp; E-Commerce</text>
+      </svg>
+    </div>
+
+    <!-- 3 Category Cards with Condensed Module Descriptions -->
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <!-- Cat 1 -->
+      <div style="background:#fff;border:1px solid #DFCEDA;border-left:4px solid #714B67;border-radius:10px;padding:10px 12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:800;color:#714B67;">&#128202; 1. Finance &amp; Control</span>
+          <span style="font-size:.65rem;background:#F7F1F5;color:#714B67;padding:2px 7px;border-radius:99px;font-weight:700;">3 Core Modules</span>
+        </div>
+        <p style="font-size:.72rem;color:#666;font-style:italic;margin-bottom:7px;">Stay compliant, safeguard cash flow, and maintain total financial clarity.</p>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:.74rem;color:#2C2C3E;">
+          <div><strong style="color:#714B67;">&bull; Accounting &amp; Invoicing:</strong> Live ledger for Ethiopian taxes (VAT, Withholding), e-invoicing, fiscal printers, Amharic menus &amp; local fiscal years.</div>
+          <div><strong style="color:#714B67;">&bull; Budget Management:</strong> Tracks planned vs. actual spending in real time across branches and departments.</div>
+          <div><strong style="color:#714B67;">&bull; HR &amp; Payroll:</strong> Centralizes staff files, attendance &amp; monthly payroll with Ethiopian income tax brackets and pension laws (7% / 11%).</div>
+        </div>
+      </div>
+
+      <!-- Cat 2 -->
+      <div style="background:#fff;border:1px solid #D2ECEC;border-left:4px solid #017E84;border-radius:10px;padding:10px 12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:800;color:#017E84;">&#128230; 2. Operations &amp; Supply Chain</span>
+          <span style="font-size:.65rem;background:#E8F6F6;color:#017E84;padding:2px 7px;border-radius:99px;font-weight:700;">4 Core Modules</span>
+        </div>
+        <p style="font-size:.72rem;color:#666;font-style:italic;margin-bottom:7px;">Eliminate stock losses, streamline purchasing, and track true production costs.</p>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:.74rem;color:#2C2C3E;">
+          <div><strong style="color:#017E84;">&bull; Inventory &amp; Warehouses:</strong> Live multi-shop stock tracking, auto reordering, mobile barcode scanning &amp; import landed costs.</div>
+          <div><strong style="color:#017E84;">&bull; Purchasing &amp; Vendors:</strong> Standardizes requisitions and 3-way matching (order, receipt, vendor bill) to stop duplicate payments.</div>
+          <div><strong style="color:#017E84;">&bull; Manufacturing (MRP):</strong> Multi-level Bills of Materials (BOM), shop-floor task tracking &amp; true finished-product unit costs.</div>
+          <div><strong style="color:#017E84;">&bull; Project Management:</strong> Visual task boards linking deliverables to field timesheets, materials used &amp; client invoicing.</div>
+        </div>
+      </div>
+
+      <!-- Cat 3 -->
+      <div style="background:#fff;border:1px solid #DFCEDA;border-left:4px solid #53354B;border-radius:10px;padding:10px 12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:800;color:#53354B;">&#128200; 3. Sales &amp; Customer Growth</span>
+          <span style="font-size:.65rem;background:#F7F1F5;color:#53354B;padding:2px 7px;border-radius:99px;font-weight:700;">3 Core Modules</span>
+        </div>
+        <p style="font-size:.72rem;color:#666;font-style:italic;margin-bottom:7px;">Sell across retail counters, enterprise sales teams, and digital channels.</p>
+        <div style="display:flex;flex-direction:column;gap:5px;font-size:.74rem;color:#2C2C3E;">
+          <div><strong style="color:#53354B;">&bull; Sales &amp; Point of Sale (POS):</strong> Fast retail/wholesale checkouts with cash, Telebirr, CBE Birr &amp; offline selling during internet cuts.</div>
+          <div><strong style="color:#53354B;">&bull; Customer Management (CRM):</strong> Visual sales pipeline, follow-up tracking &amp; revenue forecasting so deals are never lost.</div>
+          <div><strong style="color:#53354B;">&bull; Website &amp; E-Commerce:</strong> Online storefront synced live with warehouse stock, auto-generating orders and invoices.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="odoo-divider"></div>
+
+  <div id="sec6" class="odoo-sec">
+    <div class="sec-head">
+      <span class="sec-pill odoo-pill">6</span>
+      <h2 class="sec-title odoo-title">Detailed Odoo ERP Module Profiles</h2>
+    </div>
+    <p class="sec-sub odoo-sub">Tap any module or filter by category &bull; 6 key features per module</p>
+
+    <!-- Filter Bar + Expand All -->
+    <div class="filter-bar">
+      <button class="filter-pill active" onclick="filterMods('all', this)">All 10 Modules</button>
+      <button class="filter-pill" onclick="filterMods('fin', this)">Finance &amp; Control (3)</button>
+      <button class="filter-pill" onclick="filterMods('ops', this)">Operations &amp; Supply (4)</button>
+      <button class="filter-pill" onclick="filterMods('sales', this)">Sales &amp; Growth (3)</button>
+      <button class="filter-pill" style="border-color:#017E84;color:#017E84;" onclick="expandAllMods(this)" data-expanded="0">Expand All</button>
+    </div>
+
+    <div id="mod-list">
+    <div class="mod-acc open" data-cat="fin" id="mod-0">
+      <button class="mod-trig" onclick="toggleMod('mod-0')">
+        <span class="mod-num">6.1</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Accounting &amp; Invoicing</div>
+          <span class="mod-tag">Your Complete Financial Hub Built for Ethiopian Compliance.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Replaces Peachtree and unlinked spreadsheets by connecting bank accounts, daily sales, vendor bills, and warehouse stock into one live MOR-compliant ledger.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Ethiopian Tax Ready</div><div class="mod-feat-d">Pre-configured VAT (15%), Withholding Tax (2% goods / 30% services) &amp; monthly deduction reports.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>E-Invoicing &amp; Fiscal Devices</div><div class="mod-feat-d">Ready for upcoming electronic invoicing rules and certified fiscal cash registers.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Amharic &amp; Local Calendars</div><div class="mod-feat-d">Full Amharic language support and Ethiopian fiscal years (Hamle to Sene).</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Auto Bank Reconciliation</div><div class="mod-feat-d">Match bank and Telebirr statements with internal sales and payment records.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Instant Financial Reports</div><div class="mod-feat-d">Generate Profit &amp; Loss, Balance Sheets, and Trial Balances in one click.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Credit &amp; Bill Control</div><div class="mod-feat-d">Customer credit limits, payment reminders, and vendor bill-to-receipt matching.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc teal-left" data-cat="ops" id="mod-1">
+      <button class="mod-trig" onclick="toggleMod('mod-1')">
+        <span class="mod-num">6.2</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Inventory &amp; Warehouse Management</div>
+          <span class="mod-tag">Complete, Real-Time Control Over Your Stock and Stores.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Direct visibility over all goods from supplier delivery to final sale across multiple locations, preventing shortages and showing exact stock value.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Multi-Store Management</div><div class="mod-feat-d">Track inventory across shops, central warehouses, and regional branches on one screen.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Low-Stock Warnings</div><div class="mod-feat-d">Instant alerts or automated purchase drafts before essential items run out.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Barcode &amp; Mobile Scanning</div><div class="mod-feat-d">Receive goods, pack orders, and count stock using phones or barcode scanners.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Landed Cost for Importers</div><div class="mod-feat-d">Add customs duty, transit fees, and shipping directly to true unit price.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Batch, Lot &amp; Serials</div><div class="mod-feat-d">Track expiry dates for food/pharma or serial numbers for machinery.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Simple Stock Audits</div><div class="mod-feat-d">Perform cyclic inventory counts quickly without pausing daily operations.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc" data-cat="ops" id="mod-2">
+      <button class="mod-trig" onclick="toggleMod('mod-2')">
+        <span class="mod-num">6.3</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Purchasing &amp; Vendor Management</div>
+          <span class="mod-tag">Take Full Control Over Company Spending and Supplier Orders.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Digital requisitions, supplier price comparisons, and purchase orders linked with warehouse and accounting so you pay only for arrived goods.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Clear Purchase Requests</div><div class="mod-feat-d">Digital item requisitions with mandatory manager approvals before ordering.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Supplier Price Comparisons</div><div class="mod-feat-d">Send RFQs to multiple vendors to compare prices, terms, and delivery schedules.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Automated Purchase Orders</div><div class="mod-feat-d">Turn approved quotes into official printable purchase orders with one click.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>3-Way Matching</div><div class="mod-feat-d">Check purchase order, warehouse receipt, and vendor bill to stop overbilling.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Vendor Performance</div><div class="mod-feat-d">Track which local or overseas suppliers deliver on time with best quality.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Import &amp; Forex Tracking</div><div class="mod-feat-d">Manage international orders, shipments in transit, and foreign currency costs.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc teal-left" data-cat="sales" id="mod-3">
+      <button class="mod-trig" onclick="toggleMod('mod-3')">
+        <span class="mod-num">6.4</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Sales &amp; Point of Sale (POS)</div>
+          <span class="mod-tag">Close Deals Faster and Run Fast, Modern Checkout Counters.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Equips wholesale agents, showrooms, and retail cashiers to check live stock, calculate prices, and keep selling even during internet cuts.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Instant Quotes &amp; Price Lists</div><div class="mod-feat-d">Clean branded quotes in seconds with retail, wholesale, or corporate pricing.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Fast Touchscreen POS</div><div class="mod-feat-d">Modern checkout counters for shops, supermarkets, and restaurants on any device.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Local Payment Support</div><div class="mod-feat-d">Accept cash, Telebirr, CBE Birr, and bank transfers with instant receipts.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Offline Selling Mode</div><div class="mod-feat-d">Keep scanning and selling during internet cuts; auto-syncs when reconnected.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Auto Stock Reservations</div><div class="mod-feat-d">Orders reserve warehouse items immediately so out-of-stock goods are never promised.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Sales Team Tracking</div><div class="mod-feat-d">Monitor sales rep performance, commissions, and live revenue dashboards.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc" data-cat="sales" id="mod-4">
+      <button class="mod-trig" onclick="toggleMod('mod-4')">
+        <span class="mod-num">6.5</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Customer Relationship Management (CRM)</div>
+          <span class="mod-tag">Turn Leads into Loyal Clients and Never Lose a Business Deal.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Organizes client communications and sales pipelines in one visible place from first inquiry to signed contract.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Visual Sales Pipeline</div><div class="mod-feat-d">Drag-and-drop board categorized by stage (New, Qualified, Proposal Sent, Won).</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Automated Lead Capture</div><div class="mod-feat-d">Collect inquiries automatically from website, email, or social campaigns.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Follow-up Reminders</div><div class="mod-feat-d">Schedule calls, meetings, demos, and quote follow-ups so no lead is forgotten.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Complete Customer History</div><div class="mod-feat-d">Unified log of phone notes, past quotes, purchases, and client preferences.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Revenue Forecasting</div><div class="mod-feat-d">Predict monthly cash flow and expected revenue from open deal probabilities.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Lost Deal Analysis</div><div class="mod-feat-d">Record why deals were lost (price, delivery time) to refine sales strategy.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc teal-left" data-cat="fin" id="mod-5">
+      <button class="mod-trig" onclick="toggleMod('mod-5')">
+        <span class="mod-num">6.6</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Human Resources &amp; Payroll</div>
+          <span class="mod-tag">Organize Your Workforce and Automate Ethiopian Payroll.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Unifies employee profiles, attendance, and monthly compensation in full compliance with Ethiopian labor, tax, and pension rules.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Central Employee Directory</div><div class="mod-feat-d">Secure digital profiles for contracts, IDs, emergency contacts, and departments.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Ethiopian Payroll Rules</div><div class="mod-feat-d">Auto-computes progressive income tax, 7% employee pension &amp; 11% employer pension.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Attendance &amp; Shifts</div><div class="mod-feat-d">Track daily check-ins via biometric devices, RFID cards, or mobile check-in.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Leave &amp; Holiday Approvals</div><div class="mod-feat-d">Online annual, sick, or maternity leave requests with live balance tracking.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Direct Bank Disbursals</div><div class="mod-feat-d">Generate summary payment files for bank salary transfers or Telebirr wallets.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Expense Reimbursements</div><div class="mod-feat-d">Staff submit fuel and expense claims by phone for quick verification and payout.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc" data-cat="ops" id="mod-6">
+      <button class="mod-trig" onclick="toggleMod('mod-6')">
+        <span class="mod-num">6.7</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Manufacturing &amp; Production (MRP)</div>
+          <span class="mod-tag">Streamline Production Lines, Control Raw Materials, and Track Costs.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Built for assembly plants, food processors, metal fabricators, and workshops—connecting the shop floor with raw material stores and finance.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Bills of Materials (BOM)</div><div class="mod-feat-d">Exact product recipe cards and ingredient lists including multi-stage assemblies.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Raw Material Reservations</div><div class="mod-feat-d">Auto-allocates raw goods from inventory as soon as a work order is scheduled.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Shop Floor Work Orders</div><div class="mod-feat-d">Assign tasks to machines or stations, tracking start times, pauses, and output.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>True Unit Cost Tracking</div><div class="mod-feat-d">Combines raw materials, direct labor hours, and machine overhead automatically.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Scrap &amp; Waste Management</div><div class="mod-feat-d">Log material loss or defective output during runs to pinpoint bottlenecks.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Quality Checkpoints</div><div class="mod-feat-d">Mandatory quality control steps before finished goods enter inventory.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc teal-left" data-cat="fin" id="mod-7">
+      <button class="mod-trig" onclick="toggleMod('mod-7')">
+        <span class="mod-num">6.8</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Budget Management</div>
+          <span class="mod-tag">Maintain Financial Discipline and Monitor Real Expenses in Real Time.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Links budgets directly to the general ledger to compare planned targets against actual transactions across departments, projects, or cost centers.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Department &amp; Project Budgets</div><div class="mod-feat-d">Set monthly, quarterly, or annual limits for business units or branches.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Live Planned vs. Actual</div><div class="mod-feat-d">Side-by-side income and expense comparisons with zero manual collation.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Early Overspending Warnings</div><div class="mod-feat-d">Receive alerts when expenditures approach or exceed allocated budget lines.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Analytical Cost Centers</div><div class="mod-feat-d">Tag daily purchase invoices and expenses to specific branch or project codes.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Multi-Period Planning</div><div class="mod-feat-d">Parallel budgets for optimistic, conservative, or baseline projections.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Management Dashboards</div><div class="mod-feat-d">Color-coded visual reports showing current budget usage percentages at a glance.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc" data-cat="ops" id="mod-8">
+      <button class="mod-trig" onclick="toggleMod('mod-8')">
+        <span class="mod-num">6.9</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Project Management</div>
+          <span class="mod-tag">Deliver Customer Work on Schedule and Keep Project Costs Under Control.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Helps contractors, service firms, and technical teams plan and execute deliverables linked to timesheets, billing, and material procurement.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Visual Kanban Task Boards</div><div class="mod-feat-d">Organize deliverables by stage (Planning, In Progress, Review, Completed).</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Gantt Charts &amp; Milestones</div><div class="mod-feat-d">Map complex schedules, critical deadlines, and task dependencies visually.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Employee Timesheets</div><div class="mod-feat-d">Field and technical staff record hours worked per task on mobile or desktop.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Automated Project Invoicing</div><div class="mod-feat-d">Bill clients by milestones, fixed contracts, or billable hourly rates in one click.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Project Material Consumption</div><div class="mod-feat-d">Link warehouse items and site expenses to a project code for true net profit.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Document &amp; Client Portals</div><div class="mod-feat-d">Share updates, drawings, and approvals with clients and site supervisors.</div></div></div>
+      </div>
+    </div>
+    <div class="mod-acc teal-left" data-cat="sales" id="mod-9">
+      <button class="mod-trig" onclick="toggleMod('mod-9')">
+        <span class="mod-num">6.10</span>
+        <div class="mod-head-wrap">
+          <div class="mod-title">Odoo Website &amp; E-Commerce</div>
+          <span class="mod-tag">Build Your Online Store and Sell Directly into Your ERP.</span>
+        </div>
+        <svg class="mod-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="mod-body">
+        <p style="font-size:.74rem;color:#3A3A5A;line-height:1.42;margin-top:8px;">Connects your digital storefront directly with warehouse stock and accounting so online purchases automatically reserve stock and draft invoices.</p>
+        <div class="mod-feat-grid"><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Drag-and-Drop Web Builder</div><div class="mod-feat-d">Create mobile-friendly web pages and product catalogs without coding.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Direct Inventory Sync</div><div class="mod-feat-d">Quantities update live online; out-of-stock warehouse items hide automatically.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Local &amp; Global Payments</div><div class="mod-feat-d">Accept Telebirr, CBE Birr, bank transfers, and Visa/Mastercard for foreign buyers.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Customer Self-Service Portal</div><div class="mod-feat-d">Clients log in to view order status, download tax invoices, and track deliveries.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>Auto Order Fulfillment</div><div class="mod-feat-d">Online purchases instantly generate sales orders, packing slips, and draft invoices.</div></div><div class="mod-feat-chip"><div class="mod-feat-t"><span>&#10004;</span>B2B &amp; B2C Pricing Rules</div><div class="mod-feat-d">Show retail prices to visitors and negotiated wholesale discounts to corporate logins.</div></div></div>
+      </div>
+    </div></div>
+  </div>
+</div><!-- /odoo-zone-wrap -->
+<div class="v-divider"></div>
+
+<div id="sec7" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">7</span>
+    <h2 class="sec-title">Additional Modules &amp; Custom Solutions</h2>
+  </div>
+  <p class="sec-sub">Growing Beyond the Basics with AI and Custom Workflows</p>
+
+  <!-- AI OCR Visual Flow Infographic -->
+  <div style="background:linear-gradient(135deg,#1B1464 0%,#003B95 100%);border-radius:10px;padding:11px 10px;color:#fff;margin-bottom:12px;">
+    <div style="font-size:.66rem;font-weight:800;color:#FFA600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">&#9889; Native AI &amp; Custom Workflow Integration</div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:4px;align-items:center;text-align:center;font-size:.69rem;font-weight:700;">
+      <div style="background:rgba(255,255,255,.12);padding:6px 4px;border-radius:7px;">Printed Supplier Invoice / Receipt</div>
+      <span style="color:#FFA600;font-weight:800;">&#10140;</span>
+      <div style="background:rgba(255,166,0,.22);border:1px solid rgba(255,166,0,.45);padding:6px 4px;border-radius:7px;color:#FFA600;">AI OCR Extracts Vendor, Date &amp; Totals</div>
+      <span style="color:#FFA600;font-weight:800;">&#10140;</span>
+      <div style="background:rgba(6,162,37,.28);padding:6px 4px;border-radius:7px;color:#86EFAC;">Auto-Drafts Accounting Entry</div>
+    </div>
+  </div>
+
+  <!-- 4 Ecosystem Cards (7.1 - 7.4) -->
+  <div class="grid-2">
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+        <span style="background:#1B1464;color:#FFA600;font-size:.66rem;font-weight:800;padding:2px 6px;border-radius:5px;">7.1</span>
+        <span class="v-card-title">Free Built-In Team Chat</span>
+      </div>
+      <div class="v-card-desc" style="display:flex;flex-direction:column;gap:4px;">
+        <div><strong>&bull; Odoo Discuss:</strong> Private team channels &amp; direct messages replacing chaotic WhatsApp/Telegram groups.</div>
+        <div><strong>&bull; Document Chatter:</strong> Chat, tag staff &amp; attach receipts directly under any invoice or PO.</div>
+        <div><strong>&bull; Live Website Chat:</strong> Turn online visitors into sales leads in real time.</div>
+      </div>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+        <span style="background:#003B95;color:#fff;font-size:.66rem;font-weight:800;padding:2px 6px;border-radius:5px;">7.2</span>
+        <span class="v-card-title">Built-In AI Integration</span>
+      </div>
+      <div class="v-card-desc" style="display:flex;flex-direction:column;gap:4px;">
+        <div><strong>&bull; Smart Receipt Scanning:</strong> AI reads supplier bills and drafts accounting entries.</div>
+        <div><strong>&bull; Email &amp; Proposal Drafts:</strong> AI text assistance for client quotes and follow-ups.</div>
+        <div><strong>&bull; AI Chatbots &amp; Helpdesk:</strong> Connect ChatGPT/AI assistants to answer client questions &amp; route tickets.</div>
+      </div>
+    </div>
+
+    <div class="v-card">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+        <span style="background:#06A225;color:#fff;font-size:.66rem;font-weight:800;padding:2px 6px;border-radius:5px;">7.3</span>
+        <span class="v-card-title">100+ Ready Modules</span>
+      </div>
+      <div class="v-card-desc" style="display:flex;flex-direction:column;gap:4px;">
+        <div><strong>&bull; Fleet &amp; Vehicles:</strong> Fuel, maintenance &amp; driver logs.</div>
+        <div><strong>&bull; Quality Control:</strong> Mandatory checks for imports &amp; production.</div>
+        <div><strong>&bull; Maintenance &amp; Repair:</strong> Prevent factory or truck breakdowns.</div>
+        <div><strong>&bull; Barcode &amp; Documents:</strong> Digitize trade licenses &amp; contracts.</div>
+      </div>
+    </div>
+
+    <div class="v-card" style="background:#F0F4FF;border-color:#B8C7F0;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+        <span style="background:#FFA600;color:#000C1D;font-size:.66rem;font-weight:800;padding:2px 6px;border-radius:5px;">7.4</span>
+        <span class="v-card-title">Custom Dev by Addis Tech</span>
+      </div>
+      <div class="v-card-desc" style="display:flex;flex-direction:column;gap:4px;">
+        <div><strong>&bull; Exact Workflow:</strong> Import container clearance, wholesale loyalty, or agricultural collection sheets.</div>
+        <div><strong>&bull; Local Integrations:</strong> Connect local bank APIs &amp; Telebirr gateways.</div>
+        <div><strong>&bull; Upgrade-Safe:</strong> Built on standard Odoo frameworks for smooth yearly updates.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="v-divider"></div>
+
+<div id="sec8" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">8</span>
+    <h2 class="sec-title">Industries Covered by Odoo ERP</h2>
+  </div>
+  <p class="sec-sub">Built for the Realities of the Ethiopian Economy &bull; Tap any sector</p>
+
+  <div class="ind-grid">
+    <button class="ind-tile active" onclick="selInd(0)">
+      <span class="ind-tile-num">8.1</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      <span class="ind-tile-name">Wholesale &amp; Import</span>
+    </button>
+    <button class="ind-tile" onclick="selInd(1)">
+      <span class="ind-tile-num">8.2</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
+      <span class="ind-tile-name">Manufacturing</span>
+    </button>
+    <button class="ind-tile" onclick="selInd(2)">
+      <span class="ind-tile-num">8.3</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><path d="M9 20v-6h6v6"/></svg>
+      <span class="ind-tile-name">Construction</span>
+    </button>
+    <button class="ind-tile" onclick="selInd(3)">
+      <span class="ind-tile-num">8.4</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="ind-tile-name">Retail &amp; POS</span>
+    </button>
+    <button class="ind-tile" onclick="selInd(4)">
+      <span class="ind-tile-num">8.5</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <span class="ind-tile-name">Services &amp; NGOs</span>
+    </button>
+    <button class="ind-tile" onclick="selInd(5)">
+      <span class="ind-tile-num">8.6</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <span class="ind-tile-name">Healthcare</span>
+    </button></div>
+  
+    <div class="ind-view active" id="ind-v-0">
+      <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:800;color:#1B1464;">8.1. Wholesale, Distribution &amp; Import/Export</div>
+      <div style="font-size:.73rem;color:#003B95;font-style:italic;margin-bottom:4px;">For general importers, FMCG distributors, building material suppliers, and regional traders.</div>
+      <div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Landed Cost Calculations</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Distribute maritime shipping, transit fees, customs duties, and local transport directly onto true unit cost.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Multi-Warehouse Logistics</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Manage central storage hubs in Addis Ababa alongside regional distribution stores on one screen.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Credit &amp; Wholesale Pricing</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Set custom credit limits for distributors and tiered price lists for high-volume buyers.</div></div>
+    </div>
+    <div class="ind-view" id="ind-v-1">
+      <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:800;color:#1B1464;">8.2. Manufacturing &amp; Agro-Processing</div>
+      <div style="font-size:.73rem;color:#003B95;font-style:italic;margin-bottom:4px;">For factories, metal and wood workshops, food and beverage producers, and edible oil/flour mills.</div>
+      <div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Formula &amp; Recipe Control (BOM)</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Define multi-level Bills of Materials to track exact raw ingredients or parts per batch.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Production Floor Tracking</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Monitor station work orders, machine runtimes, and labor hours for accurate unit costs.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Scrap &amp; Waste Auditing</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Log raw material waste and scrap during runs to stop inventory leakage.</div></div>
+    </div>
+    <div class="ind-view" id="ind-v-2">
+      <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:800;color:#1B1464;">8.3. Construction, Engineering &amp; Contracting</div>
+      <div style="font-size:.73rem;color:#003B95;font-style:italic;margin-bottom:4px;">For general contractors, electro-mechanical firms, and specialized project service providers.</div>
+      <div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Project Milestone Tracking</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Track project phases visually using Kanban boards and Gantt charts to keep site deliverables on schedule.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Site Material Usage</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Assign warehouse withdrawals and equipment usage directly to construction sites or project codes.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Progress Invoicing</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Bill clients automatically based on completed milestones, verified timesheets, or percentage-of-completion.</div></div>
+    </div>
+    <div class="ind-view" id="ind-v-3">
+      <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:800;color:#1B1464;">8.4. Retail Chains, Supermarkets &amp; Showrooms</div>
+      <div style="font-size:.73rem;color:#003B95;font-style:italic;margin-bottom:4px;">For electronics stores, fashion boutiques, supermarkets, and construction supply outlets.</div>
+      <div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Fast Point of Sale (POS)</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Ring up sales quickly using barcode scanners, receipt printers, and touchscreen interfaces.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Local Payment Support</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Accept cash, Telebirr, CBE Birr, and card payments directly at the cash register.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Uninterrupted Offline Selling</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Keep selling and printing receipts during network cuts; auto-syncs once reconnected.</div></div>
+    </div>
+    <div class="ind-view" id="ind-v-4">
+      <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:800;color:#1B1464;">8.5. Professional Services, Consulting &amp; NGOs</div>
+      <div style="font-size:.73rem;color:#003B95;font-style:italic;margin-bottom:4px;">For audit firms, legal practices, consulting agencies, and non-profit organizations.</div>
+      <div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Budget &amp; Fund Accounting</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Track grants, donor funds, and expenditures against approved budget lines in real time.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Timesheet &amp; Billing</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Track billable consultant hours and generate client invoices with one click.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Document &amp; Approval Control</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Manage purchase approvals, vendor agreements, and payment vouchers digitally without paper trails.</div></div>
+    </div>
+    <div class="ind-view" id="ind-v-5">
+      <div style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:800;color:#1B1464;">8.6. Healthcare, Clinics &amp; Pharmaceuticals</div>
+      <div style="font-size:.73rem;color:#003B95;font-style:italic;margin-bottom:4px;">For private hospitals, specialty clinics, pharmacies, and pharmaceutical importers.</div>
+      <div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Expiry &amp; Batch/Lot Control</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Track medications and supplies by batch numbers and expiration dates with automatic pre-expiry alerts.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Direct POS for Pharmacies</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Issue compliant receipts and track shelf inventory instantly at retail medicine counters.</div></div><div style="background:#fff;border:1px solid #E2E5F3;border-left:3px solid #FFA600;border-radius:7px;padding:7px 9px;margin-top:6px;"><div style="font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:700;color:#1B1464;">Strict Stock Traceability</div><div style="font-size:.72rem;color:#444462;line-height:1.38;">Maintain an unbroken audit trail for regulated supplies from customs arrival to patient dispensing.</div></div>
+    </div>
+</div>
+<div class="v-divider"></div>
+
+<div id="sec9" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">9</span>
+    <h2 class="sec-title">Implementation Approach &amp; Methodology</h2>
+  </div>
+  <p class="sec-sub">A Practical, Step-by-Step Path to Business Transformation</p>
+
+  <div style="background:#E5F0FC;border-left:3.5px solid #003B95;padding:9px 11px;border-radius:0 8px 8px 0;margin-bottom:12px;font-size:.76rem;color:#1A1A2E;line-height:1.42;">
+    <strong>Software alone will not transform a company; execution does.</strong> Addis Tech breaks every rollout into <strong>4 straightforward phases</strong> tailored to Ethiopian realities (manual store records, internet fluctuations, paper approval habits) to guarantee smooth adoption from day one.
+  </div>
+
+  <!-- 4-Phase Visual Timeline Infographic -->
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+    <!-- Phase 1 -->
+    <div style="background:#F8F9FE;border:1px solid #DCE1F5;border-left:4px solid #1B1464;border-radius:10px;padding:10px 11px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:#1B1464;color:#FFA600;font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">1</span>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">Phase 1: Discovery &amp; Business Blueprint</div>
+          <div style="font-size:.69rem;color:#003B95;font-style:italic;">Understanding how your business runs before configuring software</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:6px;">
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;display:block;">On-Site Walkthrough</strong>Inspect head office, shops &amp; regional hubs.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;display:block;">Process Mapping</strong>Document PO-to-shelf, sales &amp; MOR VAT filing.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;display:block;">Clear Blueprint</strong>Roles, approvals &amp; milestones approved first.</div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div style="background:#F8F9FE;border:1px solid #DCE1F5;border-left:4px solid #003B95;border-radius:10px;padding:10px 11px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:#003B95;color:#fff;font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">2</span>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">Phase 2: System Configuration &amp; Localization</div>
+          <div style="font-size:.69rem;color:#003B95;font-style:italic;">Tailoring the system to match your daily workflow and local tax rules</div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:6px;gap:5px;">
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;">&bull; Core Module Setup:</strong> Accounting, Inventory, Sales, Purchase, HR, or Production.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;">&bull; Ethiopian Tax Setup:</strong> VAT 15%, Withholding, fiscal calendars &amp; fiscal machines.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;">&bull; Local Integrations:</strong> Connect Telebirr, CBE Birr &amp; company databases.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;">&bull; Simulation &amp; Testing:</strong> Test containers, tax invoices &amp; payroll before launch.</div>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div style="background:#F8F9FE;border:1px solid #DCE1F5;border-left:4px solid #FFA600;border-radius:10px;padding:10px 11px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">3</span>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">Phase 3: Data Transfer &amp; Hands-On Staff Training</div>
+          <div style="font-size:.69rem;color:#003B95;font-style:italic;">Cleaning your business records and empowering your employees</div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin:6px 0;gap:5px;">
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;">&bull; Data Cleansing:</strong> Verify opening balances, contacts &amp; stock from Peachtree/Excel.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;">&bull; Accurate Data Import:</strong> Reconcile against financial statements for zero data loss.</div>
+      </div>
+      <!-- Role-Based In-Person Training 2x2 Visual Grid -->
+      <div style="background:#1B1464;color:#fff;border-radius:8px;padding:8px 9px;">
+        <div style="font-size:.68rem;font-weight:800;color:#FFA600;text-transform:uppercase;margin-bottom:5px;">Role-Based, In-Person Training (Amharic &amp; English):</div>
+        <div class="grid-2" style="gap:5px;font-size:.68rem;">
+          <div style="background:rgba(255,255,255,.1);padding:5px 7px;border-radius:6px;"><strong style="color:#FFA600;display:block;">Sales &amp; Cashiers</strong>Touchscreen POS, receipts, Telebirr &amp; cash.</div>
+          <div style="background:rgba(255,255,255,.1);padding:5px 7px;border-radius:6px;"><strong style="color:#FFA600;display:block;">Warehouse Staff</strong>Barcodes, supplier shipments, slips &amp; stock counts.</div>
+          <div style="background:rgba(255,255,255,.1);padding:5px 7px;border-radius:6px;"><strong style="color:#FFA600;display:block;">Accountants</strong>VAT reports, vendor bill matching &amp; bank reconciliation.</div>
+          <div style="background:rgba(255,255,255,.1);padding:5px 7px;border-radius:6px;"><strong style="color:#FFA600;display:block;">Executive Management</strong>Live dashboards, financial reports &amp; mobile PO approvals.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div style="background:#F8F9FE;border:1px solid #DCE1F5;border-left:4px solid #06A225;border-radius:10px;padding:10px 11px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="width:24px;height:24px;border-radius:50%;background:#06A225;color:#fff;font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">4</span>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">Phase 4: Go-Live &amp; On-Site Support</div>
+          <div style="font-size:.69rem;color:#06A225;font-style:italic;">Smooth switchover with zero disruption to daily sales</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:6px;">
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;display:block;">Controlled Cutover</strong>Scheduled on weekends or month-end closings.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;display:block;">2-Week Floor Support</strong>Engineers physically on-site at your offices.</div>
+        <div style="background:#fff;border:1px solid #E2E5F3;border-radius:6px;padding:6px;font-size:.69rem;"><strong style="color:#1B1464;display:block;">Ongoing Maintenance</strong>Regular backups, updates &amp; local technical support.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 Implementation Guarantees Shield Cards -->
+  <p style="font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:800;color:#1B1464;margin-bottom:7px;">Our Implementation Guarantees</p>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;">
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:9px;padding:8px 7px;text-align:center;">
+      <div style="font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:800;color:#14532D;margin-bottom:3px;">&#128737; Phased Deployment</div>
+      <p style="font-size:.68rem;color:#166534;line-height:1.35;">Start with Accounting, Inventory &amp; Sales first; add Manufacturing or CRM once staff are comfortable.</p>
+    </div>
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:9px;padding:8px 7px;text-align:center;">
+      <div style="font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:800;color:#14532D;margin-bottom:3px;">&#128274; Zero Data Loss</div>
+      <p style="font-size:.68rem;color:#166534;line-height:1.35;">Opening cash, customer debts, supplier payables &amp; stock counts audited line-by-line before retiring old tools.</p>
+    </div>
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:9px;padding:8px 7px;text-align:center;">
+      <div style="font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:800;color:#14532D;margin-bottom:3px;">&#129309; Local Accountability</div>
+      <p style="font-size:.68rem;color:#166534;line-height:1.35;">Work directly with software engineers and consultants based in Addis Ababa for immediate in-person support.</p>
+    </div>
+  </div>
+</div>
+<div class="v-divider"></div>
+
+<div id="sec10" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">10</span>
+    <h2 class="sec-title">Project Team &amp; Governance Structure</h2>
+  </div>
+  <p class="sec-sub">Cross-functional domain specialists &amp; Odoo engineers in Finance, Sales &amp; Supply Chain</p>
+
+  <!-- Governance Structure Visual Diagram -->
+  <div style="background:linear-gradient(135deg,#1B1464,#0B0642);color:#fff;border-radius:10px;padding:10px;margin-bottom:10px;text-align:center;">
+    <div style="font-size:.68rem;font-weight:800;color:#FFA600;text-transform:uppercase;letter-spacing:.05em;">2-Tier Project Delivery Governance</div>
+    <div style="font-size:.74rem;margin:4px 0;"><strong>5 Senior Project Leads &amp; Subject-Matter Experts</strong> (Governance, Strategy &amp; Core Delivery)</div>
+    <div style="color:#FFA600;font-size:.8rem;line-height:1;">&#8595; Supported Dynamically By &#8595;</div>
+    <div style="font-size:.73rem;margin-top:3px;color:rgba(240,240,255,.9);"><strong>4 Extended Implementation &amp; Support Squad Units</strong> across all project phases</div>
+  </div>
+
+  <!-- 5 Senior Leads Compact Visual Cards -->
+  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;">
+    <div class="v-card-row" style="background:#fff;">
+      <div class="v-icon" style="width:36px;height:36px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;">EA</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">1. Eyob Atnafu &mdash; <span style="color:#003B95;">Project Manager</span></span>
+          <span style="font-size:.65rem;font-weight:800;background:#E6F7EA;color:#06A225;padding:1px 7px;border-radius:99px;">10+ Years</span>
+        </div>
+        <div style="font-size:.68rem;color:#003B95;font-weight:600;margin:2px 0;">Software Project Management | ERP Implementation | Software Development Lifecycle</div>
+        <p style="font-size:.72rem;color:#444462;line-height:1.38;">Leads overall execution, timeline, resource allocation, and risk mitigation—coordinating stakeholders and technical teams on budget and quality.</p>
+      </div>
+    </div>
+
+    <div class="v-card-row" style="background:#fff;">
+      <div class="v-icon" style="width:36px;height:36px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;">MA</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">2. Mesay Alemayehu &mdash; <span style="color:#003B95;">Lead Business (Functional) Consultant</span></span>
+          <span style="font-size:.65rem;font-weight:800;background:#E6F7EA;color:#06A225;padding:1px 7px;border-radius:99px;">12+ Years</span>
+        </div>
+        <div style="font-size:.68rem;color:#003B95;font-weight:600;margin:2px 0;">Business Process Reengineering (BPR) | Process Design | Change Management | Sales &amp; Supply Chain</div>
+        <p style="font-size:.72rem;color:#444462;line-height:1.38;">Audits workflows to design target processes. Leads functional blueprinting, change management, and user adoption aligned with international ERP best practices.</p>
+      </div>
+    </div>
+
+    <div class="v-card-row" style="background:#fff;">
+      <div class="v-icon" style="width:36px;height:36px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;">YT</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">3. Yohanis Taye &mdash; <span style="color:#003B95;">Lead Odoo Developer</span></span>
+          <span style="font-size:.65rem;font-weight:800;background:#E6F7EA;color:#06A225;padding:1px 7px;border-radius:99px;">8+ Years</span>
+        </div>
+        <div style="font-size:.68rem;color:#003B95;font-weight:600;margin:2px 0;">Odoo Core Architecture | Custom Module Development | System Integration | Backend Engineering</div>
+        <p style="font-size:.72rem;color:#444462;line-height:1.38;">Spearheads technical customization, module configuration, and API integrations with clean architecture and tailored workflow logic.</p>
+      </div>
+    </div>
+
+    <div class="v-card-row" style="background:#fff;">
+      <div class="v-icon" style="width:36px;height:36px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;">GM</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">4. Gashaw Mekonen &mdash; <span style="color:#003B95;">Accounting &amp; Finance Expert</span></span>
+          <span style="font-size:.65rem;font-weight:800;background:#E6F7EA;color:#06A225;padding:1px 7px;border-radius:99px;">13+ Yrs &bull; Certified Accountant &amp; Auditor</span>
+        </div>
+        <div style="font-size:.68rem;color:#003B95;font-weight:600;margin:2px 0;">Financial Advisory | Tax Compliance &amp; Reporting | Statutory Auditing | Cost Accounting</div>
+        <p style="font-size:.72rem;color:#444462;line-height:1.38;">Oversees financial localization, Chart of Accounts, and MOR tax setup (VAT, Withholding) for automated reconciliation and complete audit readiness.</p>
+      </div>
+    </div>
+
+    <div class="v-card-row" style="background:#fff;">
+      <div class="v-icon" style="width:36px;height:36px;font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;">BT</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+          <span style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;">5. Belay Tadios &mdash; <span style="color:#003B95;">Senior DevOps Engineer</span></span>
+          <span style="font-size:.65rem;font-weight:800;background:#E6F7EA;color:#06A225;padding:1px 7px;border-radius:99px;">6+ Years</span>
+        </div>
+        <div style="font-size:.68rem;color:#003B95;font-weight:600;margin:2px 0;">ERP Infrastructure &amp; Deployment | System Environment Setup | Database Security &amp; Optimization</div>
+        <p style="font-size:.72rem;color:#444462;line-height:1.38;">Architect of cloud and on-premise servers—responsible for security, automated backups, high availability, and offline-online sync.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Extended Implementation & Support Squad (2x2 Grid) -->
+  <p style="font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:800;color:#1B1464;margin-bottom:6px;">Extended Implementation &amp; Support Squad</p>
+  <div class="grid-2">
+    <div class="v-card">
+      <span class="v-card-title">Functional Consultants</span>
+      <p class="v-card-desc">Module-specific user training (Amharic &amp; English), daily workflow setup &amp; initial go-live assistance.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">Software &amp; Integration Devs</span>
+      <p class="v-card-desc">Custom reports, data extraction scripts, interface tuning &amp; local payment/hardware integrations.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">Data Migration Analysts</span>
+      <p class="v-card-desc">Cleansing, auditing, and loading historical balances, contacts &amp; stock counts for zero data loss.</p>
+    </div>
+    <div class="v-card">
+      <span class="v-card-title">On-Site Floor Technicians</span>
+      <p class="v-card-desc">Stationed at headquarters, retail stores, or warehouses during launch to guide users instantly.</p>
+    </div>
+  </div>
+</div>
+<div class="v-divider"></div>
+
+<div id="sec11" class="v-sec">
+  <div class="sec-head">
+    <span class="sec-pill">11</span>
+    <h2 class="sec-title">Next Steps &amp; Project Initiation</h2>
+  </div>
+  <p class="sec-sub">Recommended 4-Step Roadmap to Engagement with Addis Tech PLC</p>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="v-card" style="background:#fff;border-top:3px solid #FFA600;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="width:22px;height:22px;border-radius:50%;background:#FFA600;color:#000C1D;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">1</span>
+        <span class="v-card-title">Executive Alignment &amp; Live Demo</span>
+      </div>
+      <p class="v-card-desc"><strong style="color:#003B95;">Action:</strong> Schedule a tailored Odoo demo on your industry workflows (Finance, Supply Chain, POS, or MRP).</p>
+      <p class="v-card-desc"><strong style="color:#06A225;">Outcome:</strong> Experience how Odoo handles your daily scenarios &amp; local tax rules live.</p>
+    </div>
+
+    <div class="v-card" style="background:#fff;border-top:3px solid #003B95;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="width:22px;height:22px;border-radius:50%;background:#003B95;color:#fff;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">2</span>
+        <span class="v-card-title">On-Site Assessment (Blueprint)</span>
+      </div>
+      <p class="v-card-desc"><strong style="color:#003B95;">Action:</strong> 1-to-2 day walkthrough of your office, store, or warehouse locations.</p>
+      <p class="v-card-desc"><strong style="color:#06A225;">Outcome:</strong> Formal <strong>Business Requirements &amp; Scope Alignment Document</strong>.</p>
+    </div>
+
+    <div class="v-card" style="background:#fff;border-top:3px solid #1B1464;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="width:22px;height:22px;border-radius:50%;background:#1B1464;color:#FFA600;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">3</span>
+        <span class="v-card-title">Scope Approval &amp; Sign-Off</span>
+      </div>
+      <p class="v-card-desc"><strong style="color:#003B95;">Action:</strong> Review and sign the Implementation Statement of Work (SOW), milestones &amp; warranty agreement.</p>
+      <p class="v-card-desc"><strong style="color:#06A225;">Outcome:</strong> Formal authorization &amp; reservation of dedicated senior resources.</p>
+    </div>
+
+    <div class="v-card" style="background:#fff;border-top:3px solid #06A225;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="width:22px;height:22px;border-radius:50%;background:#06A225;color:#fff;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;">4</span>
+        <span class="v-card-title">Mobilization &amp; Phase 1 Kickoff</span>
+      </div>
+      <p class="v-card-desc"><strong style="color:#003B95;">Action:</strong> Official launch meeting between your executive sponsors and the Addis Tech squad.</p>
+      <p class="v-card-desc"><strong style="color:#06A225;">Outcome:</strong> Immediate start of system setup, data preparation &amp; workflow configuration.</p>
+    </div>
+  </div>
+
+  <!-- Contact Hub -->
+  <div id="contact" style="background:linear-gradient(155deg,#1B1464 0%,#0B0642 100%);border-radius:12px;padding:16px 12px;color:#fff;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+      <p style="font-family:'Outfit',sans-serif;font-size:1.02rem;font-weight:800;">&#128222; Contact Us to Get Started Today</p>
+      <a href="addis_tech_odoo_guide.html" style="font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:800;background:#fff;color:#1B1464;padding:4px 10px;border-radius:99px;text-decoration:none;">Read Full Document &rarr;</a>
+    </div>
+    <p style="font-size:.76rem;color:rgba(240,240,255,.85);margin-bottom:12px;">Take the first step toward operational excellence and real-time financial control:</p>
+
+    <div class="grid-2" style="gap:7px;">
+      <a href="https://wa.me/251911202265" target="_blank" rel="noopener" style="background:rgba(255,166,0,.18);border:1px solid rgba(255,166,0,.45);border-radius:8px;padding:9px 10px;text-decoration:none;color:#fff;display:flex;flex-direction:column;">
+        <span style="font-size:.63rem;font-weight:800;color:#FFA600;text-transform:uppercase;">WhatsApp (Primary)</span>
+        <span style="font-size:.82rem;font-weight:800;">+251 91120 2265</span>
+      </a>
+      <a href="tel:+251911505992" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 10px;text-decoration:none;color:#fff;display:flex;flex-direction:column;">
+        <span style="font-size:.63rem;font-weight:800;color:#FFA600;text-transform:uppercase;">Phone</span>
+        <span style="font-size:.82rem;font-weight:700;">+251 911 505992</span>
+      </a>
+      <a href="mailto:info@addistechplc.com" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 10px;text-decoration:none;color:#fff;display:flex;flex-direction:column;">
+        <span style="font-size:.63rem;font-weight:800;color:#FFA600;text-transform:uppercase;">Email</span>
+        <span style="font-size:.74rem;font-weight:600;">info@addistechplc.com / sales@addistechplc.com</span>
+      </a>
+      <a href="https://www.addistechplc.com" target="_blank" rel="noopener" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:9px 10px;text-decoration:none;color:#fff;display:flex;flex-direction:column;">
+        <span style="font-size:.63rem;font-weight:800;color:#FFA600;text-transform:uppercase;">Office &amp; Web</span>
+        <span style="font-size:.74rem;font-weight:600;">Addis Ababa &bull; www.addistechplc.com</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div id="bottom-dock">
+  <div class="dock-inner">
+    <a class="dock-btn dock-cta" href="https://wa.me/251911202265" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+      WhatsApp +251 91120 2265
+    </a>
+    <a class="dock-btn" href="https://wa.me/251911202265?text=Hello%20Addis%20Tech%2C%20I%20would%20like%20to%20book%20an%20Odoo%20ERP%20demo." target="_blank" rel="noopener">Book Demo</a>
+    <a class="dock-btn dock-doc" href="addis_tech_odoo_guide.html">Main Doc</a>
+    <a class="dock-btn" style="width:36px;padding:0;border-radius:50%;" href="#top" aria-label="Back to top">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+    </a>
+  </div>
+</div>
+<button id="back-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<script>
+(function(){
+  var header=document.getElementById('sticky-header');
+  var dock=document.getElementById('bottom-dock');
+  var bar=document.getElementById('progress-bar');
+  var backTop=document.getElementById('back-top');
+  var chips=[].slice.call(document.querySelectorAll('.toc-chip'));
+  var sections=chips.map(function(c){return document.querySelector(c.getAttribute('href'));});
+  var lastY=window.pageYOffset, ticking=false;
+
+  function update(){
+    var y=window.pageYOffset;
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?(y/h*100):0)+'%';
+    if(y>60 && y>lastY+4){ header.classList.add('hidden-up'); dock.classList.add('hidden-down'); }
+    else if(y<lastY-8 || y<=60){ header.classList.remove('hidden-up'); dock.classList.remove('hidden-down'); }
+    backTop.classList.toggle('show', y>600);
+    var idx=-1;
+    for(var i=0;i<sections.length;i++){ if(sections[i] && sections[i].getBoundingClientRect().top<=135) idx=i; }
+    chips.forEach(function(c,i){ c.classList.toggle('active', i===idx); });
+    // Switch sticky header into Odoo Plum mode when inside Sections 4, 5, or 6 (indices 3, 4, 5)
+    header.classList.toggle('odoo-mode', idx>=3 && idx<=5);
+    if(idx>=0){ var a=chips[idx], nav=document.getElementById('toc-nav');
+      nav.scrollLeft=a.offsetLeft-nav.clientWidth/2+a.clientWidth/2; }
+    lastY=y; ticking=false;
+  }
+  window.addEventListener('scroll',function(){ if(!ticking){ticking=true;requestAnimationFrame(update);} },{passive:true});
+  update();
+
+  chips.forEach(function(c){
+    c.addEventListener('click',function(e){
+      e.preventDefault();
+      var t=document.querySelector(c.getAttribute('href'));
+      if(t) window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-10,behavior:'smooth'});
+    });
+  });
+})();
+
+function toggleMod(id){
+  var el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+function filterMods(cat, btn){
+  document.querySelectorAll('.filter-pill').forEach(function(b){
+    if(!b.hasAttribute('data-expanded')) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  document.querySelectorAll('.mod-acc').forEach(function(m){
+    m.style.display=(cat==='all' || m.getAttribute('data-cat')===cat)?'block':'none';
+  });
+}
+
+function expandAllMods(btn){
+  var exp=btn.getAttribute('data-expanded')==='1';
+  document.querySelectorAll('.mod-acc').forEach(function(m){
+    m.classList.toggle('open', !exp);
+  });
+  btn.setAttribute('data-expanded', exp?'0':'1');
+  btn.textContent=exp?'Expand All':'Collapse All';
+}
+
+function selInd(n){
+  document.querySelectorAll('.ind-tile').forEach(function(t,i){t.classList.toggle('active',i===n);});
+  document.querySelectorAll('.ind-view').forEach(function(v,i){v.classList.toggle('active',i===n);});
+}
+</script>
+
+</body>
+</html>

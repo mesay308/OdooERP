@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.vercel/
+.DS_Store
+extracted_proposal.txt
+sec1_4.py
+sec5_7.py
+sec8_11.py
+*.mht
+*.mhtml
